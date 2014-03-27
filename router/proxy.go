@@ -17,8 +17,8 @@ func newProxy(one io.ReadWriteCloser, other io.ReadWriteCloser) *proxy {
 }
 
 func (p *proxy) start() {
-	go io.Copy(one, other)
-	go io.Copy(other, one)
+	go io.Copy(p.one, p.other)
+	go io.Copy(p.other, p.one)
 }
 
 func (p *proxy) stop() {
