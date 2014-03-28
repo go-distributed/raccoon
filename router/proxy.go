@@ -7,11 +7,15 @@ import (
 )
 
 type proxy struct {
-	status      string
-	connectors  []*connector
-	localAddr   *net.TCPAddr
+	status     string
+	connectors []*connector
+	localAddr  *net.TCPAddr
+	// todo(xiangli) save service instance rather than
+	// just remote address
 	remoteAddrs []*net.TCPAddr
 	listener    net.Listener
+	// maybe we should decouple selector with proxy
+	selector selector
 	sync.Mutex
 }
 
@@ -26,6 +30,7 @@ func newProxy(laddrStr string, raddrStrs []string) (*proxy, error) {
 		connectors:  make([]*connector, 0),
 		remoteAddrs: make([]*net.TCPAddr, 0),
 		status:      initialized,
+		selector:    defaultSelector,
 	}
 
 	if len(raddrStrs) == 0 {
@@ -71,7 +76,11 @@ func (p *proxy) start() error {
 		}
 		go func(one net.Conn) {
 			// todo(xiangli) add a selector
-			other, err := net.Dial("tcp", p.remoteAddrs[0].String())
+			p.Lock()
+			raddr := p.selector(p.remoteAddrs)
+			p.Unlock()
+
+			other, err := net.Dial("tcp", raddr.String())
 			if err != nil {
 				return
 			}
