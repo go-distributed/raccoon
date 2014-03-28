@@ -6,7 +6,7 @@ type service struct {
 	manager *serviceManager
 }
 
-func newService(name, policy, localAddr string, raddrStrs []string) (*service, error) {
+func newService(name, policy, localAddr string) (*service, error) {
 	var err error
 
 	s := &service{
@@ -15,7 +15,7 @@ func newService(name, policy, localAddr string, raddrStrs []string) (*service, e
 	}
 
 	// TODO: the selector should be chosen based on the policy
-	s.manager, err = newServiceManager(localAddr, raddrStrs, defaultSelector)
+	s.manager, err = newServiceManager(localAddr, defaultSelector)
 	if err != nil {
 		return nil, err
 	}

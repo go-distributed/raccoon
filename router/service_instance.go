@@ -6,15 +6,17 @@ import (
 
 type serviceInstance struct {
 	addr *net.TCPAddr
+	name string
 }
 
-func newServiceInstance(addrStr string) (*serviceInstance, error) {
+func newServiceInstance(name, addrStr string) (*serviceInstance, error) {
 	addr, err := net.ResolveTCPAddr("tcp", addrStr)
 	if err != nil {
 		return nil, err
 	}
-	servInst := &serviceInstance{
+	si := &serviceInstance{
+		name: name,
 		addr: addr,
 	}
-	return servInst, nil
+	return si, nil
 }
