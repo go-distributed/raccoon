@@ -12,7 +12,7 @@ import (
 
 var _ = fmt.Printf
 
-func TestProxy(t *testing.T) {
+func TestService(t *testing.T) {
 	localAddr := "127.0.0.1:8080"
 	remoteAddr := "127.0.0.1:8081"
 
@@ -23,12 +23,12 @@ func TestProxy(t *testing.T) {
 
 	go startHTTPServer(remoteAddr, expectedReply)
 
-	p, err := newProxy(localAddr, []string{remoteAddr})
+	s, err := newService("name", "policy", localAddr, []string{remoteAddr})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	go p.start()
+	go s.start()
 
 	resp, err := http.Get("http://" + localAddr + "/")
 	if err != nil {
@@ -41,6 +41,7 @@ func TestProxy(t *testing.T) {
 
 	assert.Equal(t, reply, expectedReply)
 
+	s.stop()
 }
 
 func startHTTPServer(hostPort string, writeBack []byte) {

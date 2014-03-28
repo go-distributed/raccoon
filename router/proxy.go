@@ -7,15 +7,11 @@ import (
 )
 
 type proxy struct {
-	status     string
-	connectors []*connector
-	localAddr  *net.TCPAddr
-	// todo(xiangli) save service instance rather than
-	// just remote address
-	remoteAddrs []*net.TCPAddr
-	listener    net.Listener
-	// maybe we should decouple selector with proxy
-	selector selector
+	status         string
+	connectors     []*connector
+	localAddr      *net.TCPAddr
+	listener       net.Listener
+	serviceManager *serviceManager
 	sync.Mutex
 }
 
@@ -25,28 +21,22 @@ const (
 	stopped     = "stopped"
 )
 
-func newProxy(laddrStr string, raddrStrs []string) (*proxy, error) {
-	p := &proxy{
-		connectors:  make([]*connector, 0),
-		remoteAddrs: make([]*net.TCPAddr, 0),
-		status:      initialized,
-		selector:    defaultSelector,
-	}
-
-	if len(raddrStrs) == 0 {
-		return nil, fmt.Errorf("no remote address is given")
-	}
-
+func newProxy(laddrStr string, sm *serviceManager) (*proxy, error) {
 	var err error
-	p.localAddr, err = net.ResolveTCPAddr("tcp", laddrStr)
+
+	p := &proxy{
+		connectors:     make([]*connector, 0),
+		status:         initialized,
+		serviceManager: sm,
+	}
+
 	if err != nil {
 		return nil, err
 	}
 
-	for i := range raddrStrs {
-		if err := p.addRemoteAddr(raddrStrs[i]); err != nil {
-			return nil, err
-		}
+	p.localAddr, err = net.ResolveTCPAddr("tcp", laddrStr)
+	if err != nil {
+		return nil, err
 	}
 
 	return p, nil
@@ -54,6 +44,7 @@ func newProxy(laddrStr string, raddrStrs []string) (*proxy, error) {
 
 func (p *proxy) start() error {
 	var err error
+
 	p.Lock()
 	if p.status != initialized {
 		defer p.Unlock()
@@ -74,11 +65,13 @@ func (p *proxy) start() error {
 			// handle error
 			return err
 		}
+
 		go func(one net.Conn) {
-			// todo(xiangli) add a selector
-			p.Lock()
-			raddr := p.selector(p.remoteAddrs)
-			p.Unlock()
+			raddr, err := p.serviceManager.selectServiceAddr()
+
+			if err != nil {
+				return
+			}
 
 			other, err := net.Dial("tcp", raddr.String())
 			if err != nil {
@@ -122,18 +115,5 @@ func (p *proxy) addConnector(c *connector) error {
 	}
 
 	p.connectors = append(p.connectors, c)
-	return nil
-}
-
-func (p *proxy) addRemoteAddr(raddrStr string) error {
-	p.Lock()
-	defer p.Unlock()
-
-	raddr, err := net.ResolveTCPAddr("tcp", raddrStr)
-	if err != nil {
-		return err
-	}
-
-	p.remoteAddrs = append(p.remoteAddrs, raddr)
 	return nil
 }
