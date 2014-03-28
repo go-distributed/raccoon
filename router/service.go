@@ -1,7 +1,7 @@
 package router
 
 type service struct {
-	name    string
-	policy  string
-	proxies *proxy
+	name   string
+	policy string
+	proxy  *proxy
 }

@@ -23,7 +23,7 @@ func TestProxy(t *testing.T) {
 
 	go startHTTPServer(remoteAddr, expectedReply)
 
-	p, err := newProxy(localAddr, remoteAddr)
+	p, err := newProxy(localAddr, []string{remoteAddr})
 	if err != nil {
 		t.Fatal(err)
 	}

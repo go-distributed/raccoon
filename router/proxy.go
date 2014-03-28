@@ -21,14 +21,14 @@ const (
 	stopped     = "stopped"
 )
 
-func newProxy(laddrStr string, raddrStr []string) (*proxy, error) {
+func newProxy(laddrStr string, raddrStrs []string) (*proxy, error) {
 	p := &proxy{
 		connectors:  make([]*connector, 0),
 		remoteAddrs: make([]*net.TCPAddr, 0),
 		status:      initialized,
 	}
 
-	if len(raddrStr) == 0 {
+	if len(raddrStrs) == 0 {
 		return nil, fmt.Errorf("no remote address is given")
 	}
 
@@ -38,8 +38,8 @@ func newProxy(laddrStr string, raddrStr []string) (*proxy, error) {
 		return nil, err
 	}
 
-	for i := range raddrStr {
-		if err := p.addRemoteAddr(raddrStr[i]); err != nil {
+	for i := range raddrStrs {
+		if err := p.addRemoteAddr(raddrStrs[i]); err != nil {
 			return nil, err
 		}
 	}
