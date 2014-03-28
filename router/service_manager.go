@@ -60,7 +60,7 @@ func (sm *serviceManager) selectServiceAddr() (*net.TCPAddr, error) {
 	sm.RLock()
 	defer sm.RUnlock()
 
-	raddr, err := sm.selector(sm.serviceInstances)
+	raddr, err := sm.selector.doSelection(sm.serviceInstances)
 	if err != nil {
 		return nil, err
 	}

@@ -16,7 +16,7 @@ func newService(name, policy, localAddr string) (*service, error) {
 	}
 
 	// TODO: the selector should be chosen based on the policy
-	s.manager, err = newServiceManager(localAddr, defaultSelector)
+	s.manager, err = newServiceManager(localAddr, new(defaultSelector))
 	if err != nil {
 		return nil, err
 	}
