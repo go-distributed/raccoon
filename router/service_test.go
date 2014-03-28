@@ -23,7 +23,12 @@ func TestService(t *testing.T) {
 
 	go startHTTPServer(remoteAddr, expectedReply)
 
-	s, err := newService("name", "policy", localAddr, []string{remoteAddr})
+	s, err := newService("name", "policy", localAddr)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = s.manager.addServiceInstance("testServiceInstance", remoteAddr)
 	if err != nil {
 		t.Fatal(err)
 	}
