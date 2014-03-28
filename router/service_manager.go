@@ -7,7 +7,6 @@ import (
 )
 
 type serviceManager struct {
-	proxy            *proxy
 	serviceInstances []*serviceInstance
 	selector         selector
 	sync.RWMutex
@@ -18,13 +17,6 @@ func newServiceManager(localAddr string, selector selector) (*serviceManager, er
 		serviceInstances: make([]*serviceInstance, 0),
 		selector:         selector,
 	}
-
-	var err error
-	sm.proxy, err = newProxy(localAddr, sm)
-	if err != nil {
-		return nil, err
-	}
-
 	return sm, nil
 }
 
@@ -32,7 +24,7 @@ func (sm *serviceManager) addServiceInstance(name, addrStr string) error {
 	sm.Lock()
 	defer sm.Unlock()
 
-	if sm.isIntanceExist(name) {
+	if sm.isInstanceExist(name) {
 		return fmt.Errorf("%s already exists", name)
 	}
 
@@ -49,7 +41,7 @@ func (sm *serviceManager) removeServiceInstance(name string) error {
 	sm.Lock()
 	defer sm.Unlock()
 
-	if !sm.isIntanceExist(name) {
+	if !sm.isInstanceExist(name) {
 		return fmt.Errorf("%s does not exist", name)
 	}
 

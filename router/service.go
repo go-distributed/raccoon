@@ -4,6 +4,7 @@ type service struct {
 	name    string
 	policy  string
 	manager *serviceManager
+	proxy   *proxy
 }
 
 func newService(name, policy, localAddr string) (*service, error) {
@@ -20,15 +21,20 @@ func newService(name, policy, localAddr string) (*service, error) {
 		return nil, err
 	}
 
+	s.proxy, err = newProxy(localAddr, s.manager)
+	if err != nil {
+		return nil, err
+	}
+
 	return s, nil
 }
 
 func (s *service) start() error {
-	err := s.manager.proxy.start()
+	err := s.proxy.start()
 	return err
 }
 
 func (s *service) stop() error {
-	err := s.manager.proxy.stop()
+	err := s.proxy.stop()
 	return err
 }
