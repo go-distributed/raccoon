@@ -8,7 +8,7 @@ import (
 
 type serviceManager struct {
 	serviceInstances []*serviceInstance
-	selector         selector
+	selector
 	sync.RWMutex
 }
 
@@ -60,7 +60,7 @@ func (sm *serviceManager) selectServiceAddr() (*net.TCPAddr, error) {
 	sm.RLock()
 	defer sm.RUnlock()
 
-	raddr, err := sm.selector.doSelection(sm.serviceInstances)
+	raddr, err := sm.doSelection(sm.serviceInstances)
 	if err != nil {
 		return nil, err
 	}

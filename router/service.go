@@ -2,12 +2,12 @@ package router
 
 type service struct {
 	name    string
-	policy  string
+	policy  RoutePolicy
 	manager *serviceManager
 	proxy   *proxy
 }
 
-func newService(name, policy, localAddr string) (*service, error) {
+func newService(name string, policy RoutePolicy, localAddr string) (*service, error) {
 	var err error
 
 	s := &service{
@@ -15,8 +15,12 @@ func newService(name, policy, localAddr string) (*service, error) {
 		policy: policy,
 	}
 
-	// TODO: the selector should be chosen based on the policy
-	s.manager, err = newServiceManager(localAddr, new(defaultSelector))
+	selector, err := newSelector(policy)
+	if err != nil {
+		return nil, err
+	}
+
+	s.manager, err = newServiceManager(localAddr, selector)
 	if err != nil {
 		return nil, err
 	}
