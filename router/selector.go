@@ -21,3 +21,21 @@ func (s *defaultSelector) doSelection(servInstances []*serviceInstance) (*net.TC
 	which := rand.Int() % len(servInstances)
 	return servInstances[which].addr, nil
 }
+
+type roundRounbinSelector struct {
+	counter uint32
+}
+
+func newRoundbinSelector() *roundRounbinSelector {
+	return new(roundRounbinSelector)
+}
+
+func (s *roundRounbinSelector) doSelection(serviceInstances []*serviceInstance) (*net.TCPAddr, error) {
+	if len(serviceInstances) == 0 {
+		return nil, fmt.Errorf("No service instance exists")
+	}
+
+	which := s.counter % uint32(len(serviceInstances))
+	s.counter++
+	return serviceInstances[which].addr, nil
+}
