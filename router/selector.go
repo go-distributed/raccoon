@@ -6,11 +6,15 @@ import (
 	"net"
 )
 
-type selector func(servInstances []*serviceInstance) (*net.TCPAddr, error)
+type selector interface {
+	doSelection(servInstances []*serviceInstance) (*net.TCPAddr, error)
+}
+
+type defaultSelector struct{}
 
 // defaultSelector randomly select a remote address from the proxy
 // remote address list.
-func defaultSelector(servInstances []*serviceInstance) (*net.TCPAddr, error) {
+func (s *defaultSelector) doSelection(servInstances []*serviceInstance) (*net.TCPAddr, error) {
 	if len(servInstances) == 0 {
 		return nil, fmt.Errorf("No service instance exists")
 	}

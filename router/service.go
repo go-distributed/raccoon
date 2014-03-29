@@ -4,6 +4,7 @@ type service struct {
 	name    string
 	policy  string
 	manager *serviceManager
+	proxy   *proxy
 }
 
 func newService(name, policy, localAddr string) (*service, error) {
@@ -15,7 +16,12 @@ func newService(name, policy, localAddr string) (*service, error) {
 	}
 
 	// TODO: the selector should be chosen based on the policy
-	s.manager, err = newServiceManager(localAddr, defaultSelector)
+	s.manager, err = newServiceManager(localAddr, new(defaultSelector))
+	if err != nil {
+		return nil, err
+	}
+
+	s.proxy, err = newProxy(localAddr, s.manager)
 	if err != nil {
 		return nil, err
 	}
@@ -24,11 +30,11 @@ func newService(name, policy, localAddr string) (*service, error) {
 }
 
 func (s *service) start() error {
-	err := s.manager.proxy.start()
+	err := s.proxy.start()
 	return err
 }
 
 func (s *service) stop() error {
-	err := s.manager.proxy.stop()
+	err := s.proxy.stop()
 	return err
 }
