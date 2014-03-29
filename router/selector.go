@@ -10,22 +10,18 @@ type selector interface {
 	doSelection(servInstances []*serviceInstance) (*net.TCPAddr, error)
 }
 
-func newSelector(policy RoutePolicy) (selector, error) {
+func newSelector(policy routePolicy) (selector, error) {
 	var sel selector
-	switch policy.getType() {
+	switch policy.pType() {
 	case randomSelect:
 		sel = new(randomSelector)
-	case rRLoadBalance:
+	case roundRobin:
 		sel = new(roundRounbinSelector)
 	default:
-		return nil, fmt.Errorf("Unknown route policy")
+		return nil, fmt.Errorf("unknown route policy")
 	}
 	return sel, nil
 }
-
-// *************************
-// **** RANDOM SELECTOR ****
-// *************************
 
 type randomSelector struct{}
 
@@ -38,10 +34,6 @@ func (s *randomSelector) doSelection(servInstances []*serviceInstance) (*net.TCP
 	which := rand.Int() % len(servInstances)
 	return servInstances[which].addr, nil
 }
-
-// ******************************
-// **** ROUND ROBIN SELECTOR ****
-// ******************************
 
 type roundRounbinSelector struct {
 	counter uint32

@@ -2,12 +2,12 @@ package router
 
 type service struct {
 	name    string
-	policy  RoutePolicy
+	policy  routePolicy
 	manager *serviceManager
 	proxy   *proxy
 }
 
-func newService(name string, policy RoutePolicy, localAddr string) (*service, error) {
+func newService(name string, policy routePolicy, localAddr string) (*service, error) {
 	var err error
 
 	s := &service{
