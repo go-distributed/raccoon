@@ -2,6 +2,7 @@ package router
 
 import (
 	"fmt"
+	"log"
 	"net"
 	"sync"
 )
@@ -70,16 +71,19 @@ func (p *proxy) start() error {
 			raddr, err := p.serviceManager.selectServiceAddr()
 
 			if err != nil {
+				log.Println(err)
 				return
 			}
 
 			other, err := net.Dial("tcp", raddr.String())
 			if err != nil {
+				log.Println(err)
 				return
 			}
 
 			c := newConnector(one, other)
 			if err := p.addConnector(c); err != nil {
+				log.Println(err)
 				return
 			}
 
