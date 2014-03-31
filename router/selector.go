@@ -15,7 +15,7 @@ func newSelector(policy routePolicy) (selector, error) {
 	switch policy.pType() {
 	case randomSelect:
 		sel = new(randomSelector)
-	case roundRobin:
+	case roundRobinLB:
 		sel = new(roundRounbinSelector)
 	default:
 		return nil, fmt.Errorf("unknown route policy")
