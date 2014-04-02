@@ -2,11 +2,15 @@ package router
 
 import (
 	"fmt"
+	"net"
+	"net/http"
+	"net/rpc"
 	"sync"
 )
 
 type Router struct {
 	services map[string]*service
+	listener net.Listener
 	sync.Mutex
 }
 
@@ -15,6 +19,25 @@ func New() (*Router, error) {
 		services: make(map[string]*service),
 	}
 	return r, nil
+}
+
+func (r *Router) Start() (err error) {
+	if err = rpc.Register(newRouterRPC(r)); err != nil {
+		return
+	}
+
+	rpc.HandleHTTP()
+	r.listener, err = net.Listen("tcp", ":14817")
+	if err != nil {
+		return
+	}
+	go http.Serve(r.listener, nil)
+
+	return
+}
+
+func (r *Router) Stop() error {
+	return r.listener.Close()
 }
 
 func (r *Router) AddService(sName, localAddr string, policy routePolicy) error {
@@ -35,6 +58,7 @@ func (r *Router) AddService(sName, localAddr string, policy routePolicy) error {
 	go s.start()
 
 	r.services[sName] = s
+
 	return nil
 }
 
