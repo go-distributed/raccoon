@@ -7,12 +7,11 @@ type service struct {
 	proxy   *proxy
 }
 
-func newService(name string, policy routePolicy, localAddr string) (*service, error) {
+func newService(name string, localAddr string, policy routePolicy) (*service, error) {
 	var err error
 
 	s := &service{
-		name:   name,
-		policy: policy,
+		name: name,
 	}
 
 	selector, err := newSelector(policy)
@@ -20,7 +19,7 @@ func newService(name string, policy routePolicy, localAddr string) (*service, er
 		return nil, err
 	}
 
-	s.manager, err = newServiceManager(localAddr, selector)
+	s.manager, err = newServiceManager(selector)
 	if err != nil {
 		return nil, err
 	}
@@ -31,6 +30,17 @@ func newService(name string, policy routePolicy, localAddr string) (*service, er
 	}
 
 	return s, nil
+}
+
+func (s *service) setPolicy(policy routePolicy) error {
+	selector, err := newSelector(policy)
+	if err != nil {
+		return err
+	}
+
+	s.manager.selector = selector
+	s.policy = policy
+	return nil
 }
 
 func (s *service) start() error {

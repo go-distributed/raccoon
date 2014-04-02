@@ -7,52 +7,48 @@ import (
 )
 
 type serviceManager struct {
-	serviceInstances []*serviceInstance
+	instances []*Instance
 	selector
 	sync.RWMutex
 }
 
-func newServiceManager(localAddr string, selector selector) (*serviceManager, error) {
-	sm := &serviceManager{
-		serviceInstances: make([]*serviceInstance, 0),
-		selector:         selector,
-	}
-	return sm, nil
+func newServiceManager(selector selector) (*serviceManager, error) {
+	return &serviceManager{
+		instances: make([]*Instance, 0),
+		selector:  selector,
+	}, nil
 }
 
-func (sm *serviceManager) addServiceInstance(name, addrStr string) error {
+func (sm *serviceManager) addInstance(instance *Instance) error {
 	sm.Lock()
 	defer sm.Unlock()
 
-	if sm.isInstanceExist(name) {
-		return fmt.Errorf("%s already exists", name)
+	if sm.isInstanceExist(instance) {
+		return fmt.Errorf("Instance %s already exists", instance.name)
 	}
 
-	si, err := newServiceInstance(name, addrStr)
-	if err != nil {
-		return err
-	}
-
-	sm.serviceInstances = append(sm.serviceInstances, si)
+	sm.instances = append(sm.instances, instance)
 	return nil
 }
 
-func (sm *serviceManager) removeServiceInstance(name string) error {
+func (sm *serviceManager) removeInstance(instance *Instance) error {
 	sm.Lock()
 	defer sm.Unlock()
 
-	if !sm.isInstanceExist(name) {
-		return fmt.Errorf("%s does not exist", name)
+	if !sm.isInstanceExist(instance) {
+		return fmt.Errorf("Instance %s does not exist", instance.name)
 	}
 
-	newInstances := make([]*serviceInstance, len(sm.serviceInstances)-1)
+	newInstances := make([]*Instance, len(sm.instances)-1)
 	i := 0
-	for _, si := range sm.serviceInstances {
-		if si.name != name {
-			newInstances[i] = si
+	for _, ours := range sm.instances {
+		if ours.name != instance.name {
+			newInstances[i] = ours
 			i++
 		}
 	}
+
+	sm.instances = newInstances
 	return nil
 }
 
@@ -60,7 +56,7 @@ func (sm *serviceManager) selectServiceAddr() (*net.TCPAddr, error) {
 	sm.RLock()
 	defer sm.RUnlock()
 
-	raddr, err := sm.doSelection(sm.serviceInstances)
+	raddr, err := sm.doSelection(sm.instances)
 	if err != nil {
 		return nil, err
 	}
@@ -68,9 +64,9 @@ func (sm *serviceManager) selectServiceAddr() (*net.TCPAddr, error) {
 	return raddr, nil
 }
 
-func (sm *serviceManager) isInstanceExist(name string) bool {
-	for i := range sm.serviceInstances {
-		if sm.serviceInstances[i].name == name {
+func (sm *serviceManager) isInstanceExist(instance *Instance) bool {
+	for _, ours := range sm.instances {
+		if ours.name == instance.name {
 			return true
 		}
 	}

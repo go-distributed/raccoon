@@ -4,19 +4,20 @@ import (
 	"net"
 )
 
-type serviceInstance struct {
+type Instance struct {
 	addr *net.TCPAddr
 	name string
+	cpu  int
 }
 
-func newServiceInstance(name, addrStr string) (*serviceInstance, error) {
+func NewInstance(name, addrStr string) (*Instance, error) {
 	addr, err := net.ResolveTCPAddr("tcp", addrStr)
 	if err != nil {
 		return nil, err
 	}
-	si := &serviceInstance{
+	instance := &Instance{
 		name: name,
 		addr: addr,
 	}
-	return si, nil
+	return instance, nil
 }

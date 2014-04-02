@@ -4,8 +4,8 @@ type routePolicyType uint8
 
 const (
 	randomSelect routePolicyType = iota + 1
-	roundRobin
-	weightedBalance
+	roundRobin                   // round robin load balance
+	weighting                    // weighted load balance
 	prioritizedSelect
 )
 
@@ -31,6 +31,6 @@ func NewRandomSelectPolicy() *simplePolicy {
 	return &simplePolicy{randomSelect}
 }
 
-func NewRRLoadBalancePolicy() *simplePolicy {
+func NewRoundRobinPolicy() *simplePolicy {
 	return &simplePolicy{roundRobin}
 }
