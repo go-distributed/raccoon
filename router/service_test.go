@@ -39,7 +39,7 @@ func TestService(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = s.manager.addInstance(instance)
+	err = s.addInstance(instance)
 	if err != nil {
 		t.Fatal(err)
 	}

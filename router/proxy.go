@@ -8,11 +8,11 @@ import (
 )
 
 type proxy struct {
-	status         string
-	connectors     []*connector
-	localAddr      *net.TCPAddr
-	listener       net.Listener
-	serviceManager *serviceManager
+	status     string
+	connectors []*connector
+	localAddr  *net.TCPAddr
+	listener   net.Listener
+	service    *service
 	sync.Mutex
 }
 
@@ -22,13 +22,13 @@ const (
 	stopped     = "stopped"
 )
 
-func newProxy(laddrStr string, sm *serviceManager) (*proxy, error) {
+func newProxy(laddrStr string, s *service) (*proxy, error) {
 	var err error
 
 	p := &proxy{
-		connectors:     make([]*connector, 0),
-		status:         initialized,
-		serviceManager: sm,
+		connectors: make([]*connector, 0),
+		status:     initialized,
+		service:    s,
 	}
 
 	if err != nil {
@@ -68,7 +68,7 @@ func (p *proxy) start() error {
 		}
 
 		go func(one net.Conn) {
-			raddr, err := p.serviceManager.selectServiceAddr()
+			raddr, err := p.service.selectInstanceAddr()
 
 			if err != nil {
 				log.Println(err)
