@@ -1,23 +1,31 @@
-package router
+package controller
 
 import (
-	"encoding/gob"
+	"crypto/rand"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"net/rpc"
 	"testing"
 
+	"github.com/go-distributed/raccoon/router"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRPC(t *testing.T) {
-	r, _ := New()
+var _ = fmt.Printf
+
+func TestCRouter(t *testing.T) {
+	r, _ := router.New()
 	err := r.Start()
 	if err != nil {
 		t.Fatal("router start:", err)
 	}
 	defer r.Stop()
+
+	cr, err := NewCRouter("127.0.0.1")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	expectedReply, _ := genRandomBytesSlice(4096)
 
@@ -30,7 +38,18 @@ func TestRPC(t *testing.T) {
 	localAddr := "127.0.0.1:8080"
 	remoteAddr := ts.Listener.Addr().String()
 
-	err = prepareRouterByRPC(sName, localAddr, remoteAddr)
+	mapTo, err := router.NewInstance("test instance", remoteAddr)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// setting up service
+	err = cr.AddService(sName, localAddr, router.NewRandomSelectPolicy())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = cr.AddServiceInstance(sName, mapTo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,39 +74,13 @@ func TestRPC(t *testing.T) {
 	}
 }
 
-func prepareRouterByRPC(sName, localAddr, remoteAddr string) error {
-	mapTo, err := NewInstance("test instance", remoteAddr)
+func genRandomBytesSlice(size int) ([]byte, error) {
+	b := make([]byte, size)
+
+	_, err := rand.Read(b)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	client, err := rpc.DialHTTP("tcp", ":14817")
-	if err != nil {
-		return err
-	}
-
-	sArgs := &ServiceArgs{
-		ServiceName: sName,
-		LocalAddr:   localAddr,
-		Policy:      NewRandomSelectPolicy(),
-	}
-
-	gob.Register(sArgs.Policy)
-
-	err = client.Call("RouterRPC.AddService", sArgs, nil)
-	if err != nil {
-		return err
-	}
-
-	iArgs := &InstanceArgs{
-		ServiceName: sName,
-		Instance:    mapTo,
-	}
-
-	err = client.Call("RouterRPC.AddServiceInstance", iArgs, nil)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return b, nil
 }

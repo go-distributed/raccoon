@@ -8,20 +8,28 @@ import (
 	"sync"
 )
 
-type Router struct {
+type Router interface {
+	AddService(sName, localAddr string, policy RoutePolicy) error
+	RemoveService(sName string) error
+	SetServicePolicy(sName string, policy RoutePolicy) error
+	AddServiceInstance(sName string, instance *Instance) error
+	RemoveServiceInstance(sName string, instance *Instance) error
+}
+
+type router struct {
 	services map[string]*service
 	listener net.Listener
 	sync.Mutex
 }
 
-func New() (*Router, error) {
-	r := &Router{
+func New() (*router, error) {
+	r := &router{
 		services: make(map[string]*service),
 	}
 	return r, nil
 }
 
-func (r *Router) Start() (err error) {
+func (r *router) Start() (err error) {
 	if err = rpc.Register(newRouterRPC(r)); err != nil {
 		return
 	}
@@ -36,11 +44,11 @@ func (r *Router) Start() (err error) {
 	return
 }
 
-func (r *Router) Stop() error {
+func (r *router) Stop() error {
 	return r.listener.Close()
 }
 
-func (r *Router) AddService(sName, localAddr string, policy RoutePolicy) error {
+func (r *router) AddService(sName, localAddr string, policy RoutePolicy) error {
 	r.Lock()
 	defer r.Unlock()
 
@@ -62,7 +70,7 @@ func (r *Router) AddService(sName, localAddr string, policy RoutePolicy) error {
 	return nil
 }
 
-func (r *Router) RemoveService(sName string) error {
+func (r *router) RemoveService(sName string) error {
 	r.Lock()
 	defer r.Unlock()
 
@@ -81,7 +89,7 @@ func (r *Router) RemoveService(sName string) error {
 	return nil
 }
 
-func (r *Router) SetServicePolicy(sName string, policy RoutePolicy) error {
+func (r *router) SetServicePolicy(sName string, policy RoutePolicy) error {
 	r.Lock()
 	s, ok := r.services[sName]
 	r.Unlock()
@@ -98,7 +106,7 @@ func (r *Router) SetServicePolicy(sName string, policy RoutePolicy) error {
 	return nil
 }
 
-func (r *Router) AddServiceInstance(sName string, instance *Instance) error {
+func (r *router) AddServiceInstance(sName string, instance *Instance) error {
 	r.Lock()
 	s, ok := r.services[sName]
 	r.Unlock()
@@ -115,7 +123,7 @@ func (r *Router) AddServiceInstance(sName string, instance *Instance) error {
 	return nil
 }
 
-func (r *Router) RemoveServiceInstance(sName string, instance *Instance) error {
+func (r *router) RemoveServiceInstance(sName string, instance *Instance) error {
 	r.Lock()
 	s, ok := r.services[sName]
 	r.Unlock()

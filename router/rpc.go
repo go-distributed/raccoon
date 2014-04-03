@@ -8,7 +8,7 @@ const (
 )
 
 type RouterRPC struct {
-	router *Router
+	router Router
 }
 
 type Reply struct {
@@ -22,7 +22,6 @@ type ServiceArgs struct {
 }
 
 type ServiceReply struct {
-	Status Status
 }
 
 type InstanceArgs struct {
@@ -31,10 +30,9 @@ type InstanceArgs struct {
 }
 
 type InstanceReply struct {
-	Status Status
 }
 
-func newRouterRPC(router *Router) *RouterRPC {
+func newRouterRPC(router Router) *RouterRPC {
 	return &RouterRPC{
 		router: router,
 	}
@@ -46,46 +44,21 @@ func (rpc *RouterRPC) Echo(arg string, reply *Reply) error {
 }
 
 func (rpc *RouterRPC) AddService(args *ServiceArgs, reply *ServiceReply) error {
-	err := rpc.router.AddService(args.ServiceName, args.LocalAddr, args.Policy)
-	if err != nil {
-		reply.Status = NotOk
-	}
-
-	return err
+	return rpc.router.AddService(args.ServiceName, args.LocalAddr, args.Policy)
 }
 
 func (rpc *RouterRPC) RemoveService(args *ServiceArgs, reply *ServiceReply) error {
-	err := rpc.router.RemoveService(args.ServiceName)
-	if err != nil {
-		reply.Status = NotOk
-	}
-
-	return err
+	return rpc.router.RemoveService(args.ServiceName)
 }
 
 func (rpc *RouterRPC) SetServicePolicy(args *ServiceArgs, reply *ServiceReply) error {
-	err := rpc.router.SetServicePolicy(args.ServiceName, args.Policy)
-	if err != nil {
-		reply.Status = NotOk
-	}
-
-	return err
+	return rpc.router.SetServicePolicy(args.ServiceName, args.Policy)
 }
 
 func (rpc *RouterRPC) AddServiceInstance(args *InstanceArgs, reply *InstanceReply) error {
-	err := rpc.router.AddServiceInstance(args.ServiceName, args.Instance)
-	if err != nil {
-		reply.Status = NotOk
-	}
-
-	return err
+	return rpc.router.AddServiceInstance(args.ServiceName, args.Instance)
 }
 
 func (rpc *RouterRPC) RemoveServiceInstance(args *InstanceArgs, reply *InstanceReply) error {
-	err := rpc.router.RemoveServiceInstance(args.ServiceName, args.Instance)
-	if err != nil {
-		reply.Status = NotOk
-	}
-
-	return err
+	return rpc.router.RemoveServiceInstance(args.ServiceName, args.Instance)
 }
