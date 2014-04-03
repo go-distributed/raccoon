@@ -10,12 +10,12 @@ type selector interface {
 	doSelection(instances []*Instance) (*net.TCPAddr, error)
 }
 
-func newSelector(policy routePolicy) (selector, error) {
+func newSelector(policy RoutePolicy) (selector, error) {
 	var sel selector
-	switch policy.pType() {
-	case randomSelect:
+	switch policy.Type() {
+	case RandomSelect:
 		sel = new(randomSelector)
-	case roundRobin:
+	case RoundRobin:
 		sel = new(roundRounbinSelector)
 	default:
 		return nil, fmt.Errorf("unknown route policy")
@@ -32,7 +32,7 @@ func (s *randomSelector) doSelection(instances []*Instance) (*net.TCPAddr, error
 		return nil, fmt.Errorf("No service instance exists")
 	}
 	which := rand.Int() % len(instances)
-	return instances[which].addr, nil
+	return instances[which].Addr, nil
 }
 
 type roundRounbinSelector struct {
@@ -50,5 +50,5 @@ func (s *roundRounbinSelector) doSelection(instances []*Instance) (*net.TCPAddr,
 
 	which := s.counter % uint32(len(instances))
 	s.counter++
-	return instances[which].addr, nil
+	return instances[which].Addr, nil
 }

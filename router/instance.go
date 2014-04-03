@@ -5,9 +5,8 @@ import (
 )
 
 type Instance struct {
-	addr *net.TCPAddr
-	name string
-	cpu  int
+	Addr *net.TCPAddr
+	Name string
 }
 
 func NewInstance(name, addrStr string) (*Instance, error) {
@@ -16,8 +15,8 @@ func NewInstance(name, addrStr string) (*Instance, error) {
 		return nil, err
 	}
 	instance := &Instance{
-		name: name,
-		addr: addr,
+		Name: name,
+		Addr: addr,
 	}
 	return instance, nil
 }

@@ -40,7 +40,7 @@ func (r *Router) Stop() error {
 	return r.listener.Close()
 }
 
-func (r *Router) AddService(sName, localAddr string, policy routePolicy) error {
+func (r *Router) AddService(sName, localAddr string, policy RoutePolicy) error {
 	r.Lock()
 	defer r.Unlock()
 
@@ -81,7 +81,7 @@ func (r *Router) RemoveService(sName string) error {
 	return nil
 }
 
-func (r *Router) SetServicePolicy(sName string, policy routePolicy) error {
+func (r *Router) SetServicePolicy(sName string, policy RoutePolicy) error {
 	r.Lock()
 	s, ok := r.services[sName]
 	r.Unlock()
@@ -107,7 +107,7 @@ func (r *Router) AddServiceInstance(sName string, instance *Instance) error {
 		return fmt.Errorf("service '%s' does not exist", sName)
 	}
 
-	err := s.manager.addInstance(instance)
+	err := s.addInstance(instance)
 	if err != nil {
 		return err
 	}
@@ -124,7 +124,7 @@ func (r *Router) RemoveServiceInstance(sName string, instance *Instance) error {
 		return fmt.Errorf("service '%s' does not exist", sName)
 	}
 
-	err := s.manager.removeInstance(instance)
+	err := s.removeInstance(instance)
 	if err != nil {
 		return err
 	}
