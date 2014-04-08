@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/rpc"
 	"sync"
+	"time"
 )
 
 type Router interface {
@@ -20,6 +21,7 @@ type router struct {
 	services map[string]*service
 	listener net.Listener
 	addr     *net.TCPAddr
+	server   *rpc.Server
 	sync.Mutex
 }
 
@@ -38,16 +40,22 @@ func New(addrStr string) (*router, error) {
 }
 
 func (r *router) Start() (err error) {
-	if err = rpc.Register(newRouterRPC(r)); err != nil {
+	r.server = rpc.NewServer()
+
+	if err = r.server.Register(newRouterRPC(r)); err != nil {
 		return
 	}
 
-	rpc.HandleHTTP()
 	r.listener, err = net.ListenTCP("tcp", r.addr)
 	if err != nil {
 		return
 	}
-	go http.Serve(r.listener, nil)
+
+	// this is temporary fix
+	// adding time to avoid duplicate rpc registration in test.
+	r.server.HandleHTTP(rpc.DefaultRPCPath+time.Now().String(),
+		rpc.DefaultDebugPath+time.Now().String())
+	go http.Serve(r.listener, r.server)
 
 	return
 }

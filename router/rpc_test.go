@@ -7,9 +7,36 @@ import (
 	"net/http/httptest"
 	"net/rpc"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestEcho(t *testing.T) {
+	routerAddr := "127.0.0.1:14817"
+
+	r, _ := New(routerAddr)
+	err := r.Start()
+	if err != nil {
+		t.Fatal("router start:", err)
+	}
+	defer r.Stop()
+
+	time.Sleep(time.Millisecond * 50)
+
+	client, err := rpc.DialHTTP("tcp", ":14817")
+	if err != nil {
+		t.Fatal("dialing:", err)
+	}
+
+	reply := new(Reply)
+	err = client.Call("RouterRPC.Echo", "hello router!", reply)
+	if err != nil {
+		t.Fatal("router rpc:", err)
+	}
+
+	assert.Equal(t, reply.Value, "hello router!")
+}
 
 func TestRPC(t *testing.T) {
 	routerAddr := "127.0.0.1:14817"
@@ -32,7 +59,7 @@ func TestRPC(t *testing.T) {
 	localAddr := "127.0.0.1:8080"
 	remoteAddr := ts.Listener.Addr().String()
 
-	err = prepareRouterByRPC(sName, localAddr, remoteAddr)
+	err = prepareRouterByRPC(routerAddr, sName, localAddr, remoteAddr)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -57,13 +84,13 @@ func TestRPC(t *testing.T) {
 	}
 }
 
-func prepareRouterByRPC(sName, localAddr, remoteAddr string) error {
+func prepareRouterByRPC(routerAddr, sName, localAddr, remoteAddr string) error {
 	mapTo, err := NewInstance("test instance", "test", remoteAddr)
 	if err != nil {
 		return err
 	}
 
-	client, err := rpc.DialHTTP("tcp", ":14817")
+	client, err := rpc.DialHTTP("tcp", routerAddr)
 	if err != nil {
 		return err
 	}

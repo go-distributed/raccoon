@@ -12,14 +12,17 @@ var _ = fmt.Printf
 var _ = router.NewInstance
 
 func TestRegisterRouter(t *testing.T) {
-	r, err := router.New()
+	r, err := router.New(":14817")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	r.Start()
+	err = r.Start()
+	if err != nil {
+		t.Fatal("router start:", err)
+	}
 
-	cr, err := NewCRouter("test cRouter", "127.0.0.1")
+	cr, err := NewCRouter("test cRouter", ":14817")
 	if err != nil {
 		t.Fatal(err)
 	}
