@@ -15,14 +15,14 @@ import (
 var _ = fmt.Printf
 
 func TestCRouter(t *testing.T) {
-	r, _ := router.New()
+	r, _ := router.New(":14817")
 	err := r.Start()
 	if err != nil {
 		t.Fatal("router start:", err)
 	}
 	defer r.Stop()
 
-	cr, err := NewCRouter("127.0.0.1")
+	cr, err := NewCRouter("test cRouter", ":14817")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,7 +38,7 @@ func TestCRouter(t *testing.T) {
 	localAddr := "127.0.0.1:8080"
 	remoteAddr := ts.Listener.Addr().String()
 
-	mapTo, err := router.NewInstance("test instance", remoteAddr)
+	mapTo, err := router.NewInstance("test instance", "sample service", remoteAddr)
 	if err != nil {
 		t.Fatal(err)
 	}

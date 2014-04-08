@@ -2,18 +2,18 @@ package controller
 
 import (
 	"encoding/gob"
-	"net"
 	"net/rpc"
 
 	"github.com/go-distributed/raccoon/router"
 )
 
 type CRouter struct {
+	id     string
 	client *rpc.Client
 }
 
-func NewCRouter(addr string) (*CRouter, error) {
-	client, err := rpc.DialHTTP("tcp", net.JoinHostPort(addr, "14817"))
+func NewCRouter(id, addr string) (*CRouter, error) {
+	client, err := rpc.Dial("tcp", addr)
 	if err != nil {
 		return nil, err
 	}
@@ -22,6 +22,7 @@ func NewCRouter(addr string) (*CRouter, error) {
 	gob.Register(new(router.SimplePolicy))
 
 	return &CRouter{
+		id:     id,
 		client: client,
 	}, nil
 }

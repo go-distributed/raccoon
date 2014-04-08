@@ -21,6 +21,7 @@ type router struct {
 	services map[string]*service
 	listener net.Listener
 	addr     *net.TCPAddr
+	server   *rpc.Server
 	sync.Mutex
 }
 
@@ -44,6 +45,7 @@ func (r *router) Start() (err error) {
 	if err = s.Register(newRouterRPC(r)); err != nil {
 		return
 	}
+
 	r.listener, err = net.ListenTCP("tcp", r.addr)
 	if err != nil {
 		return
