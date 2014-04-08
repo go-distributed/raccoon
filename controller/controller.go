@@ -9,7 +9,7 @@ import (
 
 type Controller struct {
 	serviceInstances map[string][]*router.Instance
-	routers          map[string]*CRouter
+	routers          map[string]router.Router
 
 	// TODO:
 	// 1. reader writer lock
@@ -20,7 +20,7 @@ type Controller struct {
 func New() *Controller {
 	c := &Controller{
 		serviceInstances: make(map[string][]*router.Instance),
-		routers:          make(map[string]*CRouter),
+		routers:          make(map[string]router.Router),
 	}
 
 	return c

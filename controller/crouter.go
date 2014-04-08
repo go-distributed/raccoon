@@ -13,7 +13,7 @@ type CRouter struct {
 }
 
 func NewCRouter(id, addr string) (*CRouter, error) {
-	client, err := rpc.DialHTTP("tcp", addr)
+	client, err := rpc.Dial("tcp", addr)
 	if err != nil {
 		return nil, err
 	}
