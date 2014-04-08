@@ -12,7 +12,9 @@ import (
 )
 
 func TestRPC(t *testing.T) {
-	r, _ := New()
+	routerAddr := "127.0.0.1:14817"
+
+	r, _ := New(routerAddr)
 	err := r.Start()
 	if err != nil {
 		t.Fatal("router start:", err)
