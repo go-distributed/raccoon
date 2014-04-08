@@ -22,7 +22,7 @@ func TestCRouter(t *testing.T) {
 	}
 	defer r.Stop()
 
-	cr, err := NewCRouter("127.0.0.1")
+	cr, err := NewCRouter("test cRouter", "127.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,7 +38,7 @@ func TestCRouter(t *testing.T) {
 	localAddr := "127.0.0.1:8080"
 	remoteAddr := ts.Listener.Addr().String()
 
-	mapTo, err := router.NewInstance("test instance", remoteAddr)
+	mapTo, err := router.NewInstance("test instance", "sample service", remoteAddr)
 	if err != nil {
 		t.Fatal(err)
 	}
