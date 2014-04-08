@@ -17,6 +17,7 @@ var _ = assert.Empty
 func TestRouter(t *testing.T) {
 	sName := "TestService"
 	localAddr := "127.0.0.1:8080"
+	routerAddr := "127.0.0.1:14817"
 
 	expectedReply, err := genRandomBytesSlice(4096)
 	if err != nil {
@@ -35,7 +36,7 @@ func TestRouter(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r, err := New()
+	r, err := New(routerAddr)
 	if err != nil {
 		t.Fatal(err)
 	}
