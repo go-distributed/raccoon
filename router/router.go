@@ -2,9 +2,10 @@ package router
 
 import (
 	"fmt"
+	"log"
 	"net"
-	"net/http"
 	"net/rpc"
+	"strings"
 	"sync"
 )
 
@@ -38,16 +39,29 @@ func New(addrStr string) (*router, error) {
 }
 
 func (r *router) Start() (err error) {
-	if err = rpc.Register(newRouterRPC(r)); err != nil {
+	s := rpc.NewServer()
+
+	if err = s.Register(newRouterRPC(r)); err != nil {
 		return
 	}
-
-	rpc.HandleHTTP()
 	r.listener, err = net.ListenTCP("tcp", r.addr)
 	if err != nil {
 		return
 	}
-	go http.Serve(r.listener, nil)
+
+	go func() {
+		closeErr := "use of closed network connection"
+		for {
+			if conn, err := r.listener.Accept(); err != nil {
+				if strings.Contains(err.Error(), closeErr) {
+					return
+				}
+				log.Fatal(err)
+			} else {
+				go s.ServeConn(conn)
+			}
+		}
+	}()
 
 	return
 }

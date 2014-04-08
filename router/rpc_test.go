@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"net/rpc"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -20,6 +21,8 @@ func TestRPC(t *testing.T) {
 		t.Fatal("router start:", err)
 	}
 	defer r.Stop()
+
+	time.Sleep(time.Millisecond * 200)
 
 	expectedReply, _ := genRandomBytesSlice(4096)
 
@@ -63,7 +66,7 @@ func prepareRouterByRPC(sName, localAddr, remoteAddr string) error {
 		return err
 	}
 
-	client, err := rpc.DialHTTP("tcp", ":14817")
+	client, err := rpc.Dial("tcp", ":14817")
 	if err != nil {
 		return err
 	}
