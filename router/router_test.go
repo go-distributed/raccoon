@@ -30,7 +30,7 @@ func TestRouter(t *testing.T) {
 
 	remoteAddr := ts.Listener.Addr().String()
 
-	mapTo, err := NewInstance("test instance", remoteAddr)
+	mapTo, err := NewInstance("test instance", "test", remoteAddr)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -56,7 +56,7 @@ func TestRPC(t *testing.T) {
 }
 
 func prepareRouterByRPC(sName, localAddr, remoteAddr string) error {
-	mapTo, err := NewInstance("test instance", remoteAddr)
+	mapTo, err := NewInstance("test instance", "test", remoteAddr)
 	if err != nil {
 		return err
 	}
