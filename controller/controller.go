@@ -10,7 +10,7 @@ import (
 type Controller struct {
 	serviceInstances map[string][]*router.Instance
 	routers          map[string]router.Router
-
+	dispatcher       *dispatcher
 	// TODO:
 	// 1. reader writer lock
 	// 2. two locks for each map
@@ -21,6 +21,7 @@ func New() *Controller {
 	c := &Controller{
 		serviceInstances: make(map[string][]*router.Instance),
 		routers:          make(map[string]router.Router),
+		dispatcher:       newDispatcher(),
 	}
 
 	return c
@@ -35,6 +36,9 @@ func (c *Controller) RegisterRouter(cr *CRouter) error {
 	}
 
 	c.routers[cr.id] = cr
+
+	// todo: add addr
+	c.dispatcher.dispatch(NewAddRouterEvent(cr.id, ""))
 	return nil
 }
 
