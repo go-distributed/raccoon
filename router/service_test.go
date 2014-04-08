@@ -29,7 +29,7 @@ func TestService(t *testing.T) {
 
 	remoteAddr := ts.Listener.Addr().String()
 
-	instance, err := NewInstance("test instance", remoteAddr)
+	instance, err := NewInstance("test instance", "test", remoteAddr)
 	if err != nil {
 		t.Fatal(err)
 	}
