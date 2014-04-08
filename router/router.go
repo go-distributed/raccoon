@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/rpc"
+	"strings"
 	"sync"
 )
 
@@ -49,8 +50,12 @@ func (r *router) Start() (err error) {
 	}
 
 	go func() {
+		closeErr := "use of closed network connection"
 		for {
 			if conn, err := r.listener.Accept(); err != nil {
+				if strings.Contains(err.Error(), closeErr) {
+					return
+				}
 				log.Fatal(err)
 			} else {
 				go s.ServeConn(conn)
