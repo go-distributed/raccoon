@@ -54,5 +54,7 @@ func (c *Controller) RegisterServiceInstance(ins *router.Instance) error {
 	}
 
 	c.serviceInstances[ins.Service] = append(instances, ins)
+
+	c.dispatcher.dispatch(NewAddInstanceEvent(ins))
 	return nil
 }
