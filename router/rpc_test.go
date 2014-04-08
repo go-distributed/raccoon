@@ -24,7 +24,7 @@ func TestEcho(t *testing.T) {
 
 	time.Sleep(time.Millisecond * 50)
 
-	client, err := rpc.DialHTTP("tcp", ":14817")
+	client, err := rpc.Dial("tcp", ":14817")
 	if err != nil {
 		t.Fatal("dialing:", err)
 	}
@@ -47,6 +47,8 @@ func TestRPC(t *testing.T) {
 		t.Fatal("router start:", err)
 	}
 	defer r.Stop()
+
+	time.Sleep(time.Millisecond * 50)
 
 	expectedReply, _ := genRandomBytesSlice(4096)
 
@@ -90,7 +92,8 @@ func prepareRouterByRPC(routerAddr, sName, localAddr, remoteAddr string) error {
 		return err
 	}
 
-	client, err := rpc.DialHTTP("tcp", routerAddr)
+	//client, err := rpc.DialHTTP("tcp", routerAddr)
+	client, err := rpc.Dial("tcp", routerAddr)
 	if err != nil {
 		return err
 	}
