@@ -19,13 +19,21 @@ type Router interface {
 type router struct {
 	services map[string]*service
 	listener net.Listener
+	addr     *net.TCPAddr
 	sync.Mutex
 }
 
-func New() (*router, error) {
+func New(addrStr string) (*router, error) {
 	r := &router{
 		services: make(map[string]*service),
 	}
+
+	var err error
+	r.addr, err = net.ResolveTCPAddr("tcp", addrStr)
+	if err != nil {
+		return nil, err
+	}
+
 	return r, nil
 }
 
@@ -35,7 +43,7 @@ func (r *router) Start() (err error) {
 	}
 
 	rpc.HandleHTTP()
-	r.listener, err = net.Listen("tcp", ":14817")
+	r.listener, err = net.ListenTCP("tcp", r.addr)
 	if err != nil {
 		return
 	}
