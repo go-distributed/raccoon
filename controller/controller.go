@@ -102,7 +102,7 @@ func (c *Controller) RegisterServiceInstance(ins *router.Instance) error {
 
 	c.serviceInstances[ins.Service] = append(instances, ins)
 
-	// TODO: add new instance event; dispatch
+	c.dispatcher.dispatch(NewAddInstanceEvent(ins))
 	return nil
 }
 

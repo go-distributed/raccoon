@@ -1,13 +1,6 @@
 package controller
 
-import (
-	"fmt"
-
-	"github.com/go-distributed/raccoon/router"
-)
-
-var _ = fmt.Printf
-var _ = router.NewInstance
+import "github.com/go-distributed/raccoon/router"
 
 type Status int
 

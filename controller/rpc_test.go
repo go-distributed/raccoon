@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/rpc"
 	"testing"
 	"time"
@@ -10,11 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var _ = fmt.Printf
-var _ = router.NewInstance
-var _ = assert.Nil
-
-func TestRegRouterRPC(t *testing.T) {
+func TestRPC(t *testing.T) {
 	r, err := router.New(":14817")
 	if err != nil {
 		t.Fatal(err)
@@ -60,7 +55,24 @@ func TestRegRouterRPC(t *testing.T) {
 
 	assert.Equal(t, len(c.routers), 1)
 	assert.NotNil(t, c.routers["test router"])
-}
 
-func TestRegInstanceRPC(t *testing.T) {
+	ins, err := router.NewInstance("test instance", "test service", ":8888")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	regInstanceArgs := &RegInstanceArgs{
+		Instance: ins,
+	}
+
+	assert.Empty(t, c.serviceInstances)
+
+	err = client.Call("ControllerRPC.RegisterServiceInstance", regInstanceArgs, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, len(c.serviceInstances), 1)
+	assert.NotNil(t, c.serviceInstances["test service"])
+	assert.Equal(t, c.serviceInstances["test service"][0], ins)
 }
