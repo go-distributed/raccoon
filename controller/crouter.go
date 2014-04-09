@@ -5,6 +5,7 @@ import (
 	"net/rpc"
 
 	"github.com/go-distributed/raccoon/router"
+	"github.com/go-distributed/raccoon/service"
 )
 
 type CRouter struct {
@@ -29,7 +30,7 @@ func NewCRouter(id, addr string) (*CRouter, error) {
 	}, nil
 }
 
-func (cr *CRouter) AddService(sName, localAddr string, policy router.RoutePolicy) error {
+func (cr *CRouter) AddService(sName, localAddr string, policy router.Policy) error {
 	sArgs := &router.ServiceArgs{
 		ServiceName: sName,
 		LocalAddr:   localAddr,
@@ -45,7 +46,7 @@ func (cr *CRouter) RemoveService(sName string) error {
 	return cr.client.Call("RouterRPC.RemoveService", sArgs, nil)
 }
 
-func (cr *CRouter) SetServicePolicy(sName string, policy router.RoutePolicy) error {
+func (cr *CRouter) SetServicePolicy(sName string, policy router.Policy) error {
 	sArgs := &router.ServiceArgs{
 		ServiceName: sName,
 		Policy:      policy,
@@ -53,7 +54,7 @@ func (cr *CRouter) SetServicePolicy(sName string, policy router.RoutePolicy) err
 	return cr.client.Call("RouterRPC.SetServicePolicy", sArgs, nil)
 }
 
-func (cr *CRouter) AddServiceInstance(sName string, instance *router.Instance) error {
+func (cr *CRouter) AddServiceInstance(sName string, instance *service.Instance) error {
 	iArgs := &router.InstanceArgs{
 		ServiceName: sName,
 		Instance:    instance,
@@ -61,7 +62,7 @@ func (cr *CRouter) AddServiceInstance(sName string, instance *router.Instance) e
 	return cr.client.Call("RouterRPC.AddServiceInstance", iArgs, nil)
 }
 
-func (cr *CRouter) RemoveServiceInstance(sName string, instance *router.Instance) error {
+func (cr *CRouter) RemoveServiceInstance(sName string, instance *service.Instance) error {
 	iArgs := &router.InstanceArgs{
 		ServiceName: sName,
 		Instance:    instance,

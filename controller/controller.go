@@ -9,10 +9,11 @@ import (
 	"sync"
 
 	"github.com/go-distributed/raccoon/router"
+	"github.com/go-distributed/raccoon/service"
 )
 
 type Controller struct {
-	serviceInstances map[string][]*router.Instance
+	serviceInstances map[string][]*service.Instance
 	routers          map[string]router.Router
 	dispatcher       *dispatcher
 	listener         net.Listener
@@ -25,7 +26,7 @@ type Controller struct {
 
 func New(addrStr string) (*Controller, error) {
 	c := &Controller{
-		serviceInstances: make(map[string][]*router.Instance),
+		serviceInstances: make(map[string][]*service.Instance),
 		routers:          make(map[string]router.Router),
 		dispatcher:       newDispatcher(),
 	}
@@ -88,7 +89,7 @@ func (c *Controller) RegisterRouter(cr *CRouter) error {
 	return nil
 }
 
-func (c *Controller) RegisterServiceInstance(ins *router.Instance) error {
+func (c *Controller) RegisterServiceInstance(ins *service.Instance) error {
 	c.Lock()
 	defer c.Unlock()
 

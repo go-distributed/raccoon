@@ -7,14 +7,16 @@ import (
 	"net/rpc"
 	"strings"
 	"sync"
+
+	rmtService "github.com/go-distributed/raccoon/service"
 )
 
 type Router interface {
-	AddService(sName, localAddr string, policy RoutePolicy) error
+	AddService(sName, localAddr string, policy Policy) error
 	RemoveService(sName string) error
-	SetServicePolicy(sName string, policy RoutePolicy) error
-	AddServiceInstance(sName string, instance *Instance) error
-	RemoveServiceInstance(sName string, instance *Instance) error
+	SetServicePolicy(sName string, policy Policy) error
+	AddServiceInstance(sName string, instance *rmtService.Instance) error
+	RemoveServiceInstance(sName string, instance *rmtService.Instance) error
 }
 
 type router struct {
@@ -72,7 +74,7 @@ func (r *router) Stop() error {
 	return r.listener.Close()
 }
 
-func (r *router) AddService(sName, localAddr string, policy RoutePolicy) error {
+func (r *router) AddService(sName, localAddr string, policy Policy) error {
 	r.Lock()
 	defer r.Unlock()
 
@@ -113,7 +115,7 @@ func (r *router) RemoveService(sName string) error {
 	return nil
 }
 
-func (r *router) SetServicePolicy(sName string, policy RoutePolicy) error {
+func (r *router) SetServicePolicy(sName string, policy Policy) error {
 	r.Lock()
 	s, ok := r.services[sName]
 	r.Unlock()
@@ -130,7 +132,7 @@ func (r *router) SetServicePolicy(sName string, policy RoutePolicy) error {
 	return nil
 }
 
-func (r *router) AddServiceInstance(sName string, instance *Instance) error {
+func (r *router) AddServiceInstance(sName string, instance *rmtService.Instance) error {
 	r.Lock()
 	s, ok := r.services[sName]
 	r.Unlock()
@@ -147,7 +149,7 @@ func (r *router) AddServiceInstance(sName string, instance *Instance) error {
 	return nil
 }
 
-func (r *router) RemoveServiceInstance(sName string, instance *Instance) error {
+func (r *router) RemoveServiceInstance(sName string, instance *rmtService.Instance) error {
 	r.Lock()
 	s, ok := r.services[sName]
 	r.Unlock()

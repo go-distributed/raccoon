@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/go-distributed/raccoon/router"
+	"github.com/go-distributed/raccoon/service"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -38,7 +39,7 @@ func TestCRouter(t *testing.T) {
 	localAddr := "127.0.0.1:8080"
 	remoteAddr := ts.Listener.Addr().String()
 
-	mapTo, err := router.NewInstance("test instance", "sample service", remoteAddr)
+	mapTo, err := service.NewInstance("test instance", "sample service", remoteAddr)
 	if err != nil {
 		t.Fatal(err)
 	}

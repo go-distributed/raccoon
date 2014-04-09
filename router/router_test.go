@@ -1,17 +1,14 @@
 package router
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	rmtService "github.com/go-distributed/raccoon/service"
 	"github.com/stretchr/testify/assert"
 )
-
-var _ = fmt.Fprintf
-var _ = assert.Empty
 
 // TestRouter tests whether the router could route service correctly.
 func TestRouter(t *testing.T) {
@@ -31,7 +28,7 @@ func TestRouter(t *testing.T) {
 
 	remoteAddr := ts.Listener.Addr().String()
 
-	mapTo, err := NewInstance("test instance", "test", remoteAddr)
+	mapTo, err := rmtService.NewInstance("test instance", "test", remoteAddr)
 	if err != nil {
 		t.Fatal(err)
 	}

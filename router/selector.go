@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
+
+	rmtService "github.com/go-distributed/raccoon/service"
 )
 
 type selector interface {
-	doSelection(instances []*Instance) (*net.TCPAddr, error)
+	doSelection(instances []*rmtService.Instance) (*net.TCPAddr, error)
 }
 
-func newSelector(policy RoutePolicy) (selector, error) {
+func newSelector(policy Policy) (selector, error) {
 	var sel selector
 	switch policy.Type() {
 	case RandomSelect:
@@ -27,7 +29,7 @@ type randomSelector struct{}
 
 // defaultSelector randomly select a remote address from the proxy
 // remote address list.
-func (s *randomSelector) doSelection(instances []*Instance) (*net.TCPAddr, error) {
+func (s *randomSelector) doSelection(instances []*rmtService.Instance) (*net.TCPAddr, error) {
 	if len(instances) == 0 {
 		return nil, fmt.Errorf("No service instance exists")
 	}
@@ -43,7 +45,7 @@ func newRoundbinSelector() *roundRounbinSelector {
 	return new(roundRounbinSelector)
 }
 
-func (s *roundRounbinSelector) doSelection(instances []*Instance) (*net.TCPAddr, error) {
+func (s *roundRounbinSelector) doSelection(instances []*rmtService.Instance) (*net.TCPAddr, error) {
 	if len(instances) == 0 {
 		return nil, fmt.Errorf("No service instance exists")
 	}

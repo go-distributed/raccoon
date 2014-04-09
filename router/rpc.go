@@ -1,5 +1,9 @@
 package router
 
+import (
+	rmtService "github.com/go-distributed/raccoon/service"
+)
+
 type Status int
 
 const (
@@ -18,7 +22,7 @@ type Reply struct {
 type ServiceArgs struct {
 	ServiceName string
 	LocalAddr   string
-	Policy      RoutePolicy
+	Policy      Policy
 }
 
 type ServiceReply struct {
@@ -26,7 +30,7 @@ type ServiceReply struct {
 
 type InstanceArgs struct {
 	ServiceName string
-	Instance    *Instance
+	Instance    *rmtService.Instance
 }
 
 type InstanceReply struct {
