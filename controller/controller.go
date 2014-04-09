@@ -105,3 +105,7 @@ func (c *Controller) RegisterServiceInstance(ins *router.Instance) error {
 	// TODO: add new instance event; dispatch
 	return nil
 }
+
+func (c *Controller) AddListener(typ string, listener eventListener) {
+	c.dispatcher.addListener(typ, listener)
+}
