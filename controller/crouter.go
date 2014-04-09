@@ -10,6 +10,7 @@ import (
 type CRouter struct {
 	id     string
 	client *rpc.Client
+	addr   string
 }
 
 func NewCRouter(id, addr string) (*CRouter, error) {
@@ -24,6 +25,7 @@ func NewCRouter(id, addr string) (*CRouter, error) {
 	return &CRouter{
 		id:     id,
 		client: client,
+		addr:   addr,
 	}, nil
 }
 
