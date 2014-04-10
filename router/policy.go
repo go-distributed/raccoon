@@ -1,17 +1,17 @@
 package router
 
-type RoutePolicyType uint8
+type PolicyType uint8
 
 const (
-	RandomSelect RoutePolicyType = iota + 1
-	RoundRobin                   // round robin load balance
-	Weighting                    // weighted load balance
+	RandomSelect PolicyType = iota + 1
+	RoundRobin              // round robin load balance
+	Weighting               // weighted load balance
 	PrioritizedSelect
 )
 
-type RoutePolicy interface {
+type Policy interface {
 	// ptype returns the type of the policy
-	Type() RoutePolicyType
+	Type() PolicyType
 
 	// TODO: Define contents
 	// contents returns the information used to help setup
@@ -20,10 +20,10 @@ type RoutePolicy interface {
 }
 
 type SimplePolicy struct {
-	PolicyType RoutePolicyType
+	PolicyType PolicyType
 }
 
-func (p *SimplePolicy) Type() RoutePolicyType {
+func (p *SimplePolicy) Type() PolicyType {
 	return p.PolicyType
 }
 
