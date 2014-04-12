@@ -11,6 +11,8 @@ import (
 	rmtService "github.com/go-distributed/raccoon/service"
 )
 
+var ()
+
 type Router interface {
 	AddService(sName, localAddr string, policy Policy) error
 	RemoveService(sName string) error

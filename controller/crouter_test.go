@@ -35,11 +35,11 @@ func TestCRouter(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	sName := "TestService"
+	sName := "test service"
 	localAddr := "127.0.0.1:8080"
 	remoteAddr := ts.Listener.Addr().String()
 
-	mapTo := service.NewInstance("test instance", "sample service", remoteAddr)
+	mapTo := service.NewInstance("test instance", sName, remoteAddr)
 
 	// setting up service
 	err = cr.AddService(sName, localAddr, router.NewRandomSelectPolicy())
