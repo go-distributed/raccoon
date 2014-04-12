@@ -88,10 +88,7 @@ func TestRPC(t *testing.T) {
 }
 
 func prepareRouterByRPC(routerAddr, sName, localAddr, remoteAddr string) error {
-	mapTo, err := rmtService.NewInstance("test instance", "test", remoteAddr)
-	if err != nil {
-		return err
-	}
+	mapTo := rmtService.NewInstance("test instance", "test", remoteAddr)
 
 	//client, err := rpc.DialHTTP("tcp", routerAddr)
 	client, err := rpc.Dial("tcp", routerAddr)

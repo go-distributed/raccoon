@@ -1,24 +1,15 @@
 package service
 
-import (
-	"net"
-)
-
 type Instance struct {
-	Addr    *net.TCPAddr
+	Addr    string
 	Name    string
 	Service string
 }
 
-func NewInstance(name, service, addrStr string) (*Instance, error) {
-	addr, err := net.ResolveTCPAddr("tcp", addrStr)
-	if err != nil {
-		return nil, err
-	}
-	instance := &Instance{
+func NewInstance(name, service, addr string) *Instance {
+	return &Instance{
 		Name:    name,
 		Service: service,
 		Addr:    addr,
 	}
-	return instance, nil
 }

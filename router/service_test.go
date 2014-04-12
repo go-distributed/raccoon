@@ -30,17 +30,14 @@ func TestService(t *testing.T) {
 
 	remoteAddr := ts.Listener.Addr().String()
 
-	instance, err := rmtService.NewInstance("test instance", "test", remoteAddr)
-	if err != nil {
-		t.Fatal(err)
-	}
+	mapTo := rmtService.NewInstance("test instance", "test", remoteAddr)
 
 	s, err := newService("name", localAddr, NewRandomSelectPolicy())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = s.addInstance(instance)
+	err = s.addInstance(mapTo)
 	if err != nil {
 		t.Fatal(err)
 	}

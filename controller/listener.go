@@ -1,3 +1,3 @@
 package controller
 
-type eventListener func(e event)
+type EventListener func(e event)
