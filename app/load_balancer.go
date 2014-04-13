@@ -1,6 +1,8 @@
 package app
 
 import (
+	"log"
+
 	"github.com/go-distributed/raccoon/controller"
 	"github.com/go-distributed/raccoon/router"
 	"github.com/go-distributed/raccoon/service"
@@ -10,16 +12,34 @@ type LoadBalancer struct {
 	Controller *controller.Controller
 }
 
+func NewLoadBalancer(c *controller.Controller) *LoadBalancer {
+	return &LoadBalancer{c}
+}
+
 // AddRouterListener makes the Load Balancer know of the newly added router.
 // It adds known service instances to the router and set service policy as round robin.
 // TODO: It assumes the new router is newly created: which means it has no services.
-func (lb *LoadBalancer) AddRouterListener(event *controller.AddRouterEvent) {
-	cr := lb.Controller.Routers[event.Id]
+//func (lb *LoadBalancer) AddRouterListener(event *controller.AddRouterEvent) {
+func (lb *LoadBalancer) AddRouterListener(event controller.Event) {
+	if event.Type() != controller.AddRouterEventType {
+		panic("")
+	}
+
+	e := event.(*controller.AddRouterEvent)
+
+	r := lb.Controller.Routers[e.Id]
 
 	for service, instances := range lb.Controller.ServiceInstances {
-		cr.AddService(service, instances[0].Addr, router.NewRoundRobinPolicy())
+		err := r.AddService(service, router.ServicePortMap[service], router.NewRoundRobinPolicy())
+		if err != nil {
+			log.Println(err)
+		}
+
 		for _, instance := range instances {
-			cr.AddServiceInstance(service, instance)
+			err := r.AddServiceInstance(service, instance)
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 }
@@ -27,13 +47,22 @@ func (lb *LoadBalancer) AddRouterListener(event *controller.AddRouterEvent) {
 // AddInstanceListener makes the Load Balancer know of the newly added service instance.
 // It adds the service instances to the routers it knew.
 // TODO: It assumes the new instance is newly created: which means no other router had it before.
-func (lb *LoadBalancer) AddInstanceListener(event *controller.AddInstanceEvent) {
+func (lb *LoadBalancer) AddInstanceListener(event controller.Event) {
+	if event.Type() != controller.AddInstanceEventType {
+		panic("")
+	}
+
+	e := event.(*controller.AddInstanceEvent)
 	for _, r := range lb.Controller.Routers {
 		instance := &service.Instance{
-			Addr:    event.Addr,
-			Name:    event.Name,
-			Service: event.Service,
+			Addr:    e.Addr,
+			Name:    e.Name,
+			Service: e.Service,
 		}
-		r.AddServiceInstance(event.Service, instance)
+
+		err := r.AddServiceInstance(e.Service, instance)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }

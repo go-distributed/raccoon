@@ -74,6 +74,7 @@ func (c *Controller) Stop() error {
 	return err
 }
 
+// add a cRouter into router list and dispatch add-router-event
 func (c *Controller) RegisterRouter(cr *CRouter) error {
 	c.Lock()
 	defer c.Unlock()

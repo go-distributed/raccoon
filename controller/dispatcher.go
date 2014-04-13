@@ -25,7 +25,7 @@ func (d *dispatcher) addListener(typ string, listener EventListener) {
 	d.listeners[typ] = append(listeners, listener)
 }
 
-func (d *dispatcher) dispatch(e event) {
+func (d *dispatcher) dispatch(e Event) {
 	d.RLock()
 	defer d.RUnlock()
 

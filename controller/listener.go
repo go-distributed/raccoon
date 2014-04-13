@@ -1,3 +1,4 @@
 package controller
 
-type EventListener func(e event)
+// TODO: return err
+type EventListener func(e Event)

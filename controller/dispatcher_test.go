@@ -16,7 +16,7 @@ func TestDispatcher(t *testing.T) {
 	d := newDispatcher()
 
 	called := false
-	l := func(e event) {
+	l := func(e Event) {
 		called = true
 	}
 

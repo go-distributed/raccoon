@@ -7,7 +7,7 @@ const (
 	AddInstanceEventType = "AddInstanceEvent"
 )
 
-type event interface {
+type Event interface {
 	Type() string
 }
 
