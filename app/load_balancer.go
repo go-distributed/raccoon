@@ -60,7 +60,12 @@ func (lb *LoadBalancer) AddInstanceListener(event controller.Event) {
 			Service: e.Service,
 		}
 
-		err := r.AddServiceInstance(e.Service, instance)
+		err := r.AddService(e.Service, router.ServicePortMap[e.Service], router.NewRoundRobinPolicy())
+		if err != nil {
+			log.Println(err)
+		}
+
+		err = r.AddServiceInstance(e.Service, instance)
 		if err != nil {
 			log.Println(err)
 		}

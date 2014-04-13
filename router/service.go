@@ -70,7 +70,7 @@ func (s *service) addInstance(remote *rmtService.Instance) error {
 	defer s.Unlock()
 
 	if s.isInstanceExist(remote) {
-		return fmt.Errorf("Instance %s already exists", remote.Name)
+		return fmt.Errorf("instance '%s' already exists", remote.Name)
 	}
 
 	ins, err := newInstance(remote)
@@ -86,8 +86,8 @@ func (s *service) removeInstance(remote *rmtService.Instance) error {
 	s.Lock()
 	defer s.Unlock()
 
-	if s.isInstanceExist(remote) {
-		return fmt.Errorf("Instance %s already exists", remote.Name)
+	if !s.isInstanceExist(remote) {
+		return fmt.Errorf("instance '%s' does not exist", remote.Name)
 	}
 
 	newInstances := make([]*instance, len(s.instances)-1)
