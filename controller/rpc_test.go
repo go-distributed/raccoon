@@ -47,33 +47,30 @@ func TestRPC(t *testing.T) {
 		Addr: ":14817",
 	}
 
-	assert.Empty(t, c.routers)
+	assert.Empty(t, c.Routers)
 
 	err = client.Call("ControllerRPC.RegisterRouter", regRouterArgs, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, len(c.routers), 1)
-	assert.NotNil(t, c.routers["test router"])
+	assert.Equal(t, len(c.Routers), 1)
+	assert.NotNil(t, c.Routers["test router"])
 
-	ins, err := service.NewInstance("test instance", "test service", ":8888")
-	if err != nil {
-		t.Fatal(err)
-	}
+	mapTo := service.NewInstance("test instance", "test service", ":8888")
 
 	regInstanceArgs := &RegInstanceArgs{
-		Instance: ins,
+		Instance: mapTo,
 	}
 
-	assert.Empty(t, c.serviceInstances)
+	assert.Empty(t, c.ServiceInstances)
 
 	err = client.Call("ControllerRPC.RegisterServiceInstance", regInstanceArgs, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, len(c.serviceInstances), 1)
-	assert.NotNil(t, c.serviceInstances["test service"])
-	assert.Equal(t, c.serviceInstances["test service"][0], ins)
+	assert.Equal(t, len(c.ServiceInstances), 1)
+	assert.NotNil(t, c.ServiceInstances["test service"])
+	assert.Equal(t, c.ServiceInstances["test service"][0], mapTo)
 }

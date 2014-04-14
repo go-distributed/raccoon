@@ -5,19 +5,19 @@ import (
 )
 
 type dispatcher struct {
-	listeners map[string][]eventListener
+	listeners map[string][]EventListener
 	sync.RWMutex
 }
 
 func newDispatcher() *dispatcher {
 	d := &dispatcher{
-		listeners: make(map[string][]eventListener),
+		listeners: make(map[string][]EventListener),
 	}
 
 	return d
 }
 
-func (d *dispatcher) addListener(typ string, listener eventListener) {
+func (d *dispatcher) addListener(typ string, listener EventListener) {
 	d.Lock()
 	defer d.Unlock()
 
@@ -25,7 +25,7 @@ func (d *dispatcher) addListener(typ string, listener eventListener) {
 	d.listeners[typ] = append(listeners, listener)
 }
 
-func (d *dispatcher) dispatch(e event) {
+func (d *dispatcher) dispatch(e Event) {
 	d.RLock()
 	defer d.RUnlock()
 

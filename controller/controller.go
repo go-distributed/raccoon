@@ -13,8 +13,8 @@ import (
 )
 
 type Controller struct {
-	serviceInstances map[string][]*service.Instance
-	routers          map[string]router.Router
+	ServiceInstances map[string][]*service.Instance
+	Routers          map[string]router.Router
 	dispatcher       *dispatcher
 	listener         net.Listener
 	addr             *net.TCPAddr
@@ -26,8 +26,8 @@ type Controller struct {
 
 func New(addrStr string) (*Controller, error) {
 	c := &Controller{
-		serviceInstances: make(map[string][]*service.Instance),
-		routers:          make(map[string]router.Router),
+		ServiceInstances: make(map[string][]*service.Instance),
+		Routers:          make(map[string]router.Router),
 		dispatcher:       newDispatcher(),
 	}
 
@@ -74,16 +74,17 @@ func (c *Controller) Stop() error {
 	return err
 }
 
+// add a cRouter into router list and dispatch add-router-event
 func (c *Controller) RegisterRouter(cr *CRouter) error {
 	c.Lock()
 	defer c.Unlock()
 
-	_, ok := c.routers[cr.id]
+	_, ok := c.Routers[cr.id]
 	if ok {
 		return fmt.Errorf("router '%s' already exists", cr.id)
 	}
 
-	c.routers[cr.id] = cr
+	c.Routers[cr.id] = cr
 
 	c.dispatcher.dispatch(NewAddRouterEvent(cr.id, cr.addr))
 	return nil
@@ -93,7 +94,7 @@ func (c *Controller) RegisterServiceInstance(ins *service.Instance) error {
 	c.Lock()
 	defer c.Unlock()
 
-	instances := c.serviceInstances[ins.Service]
+	instances := c.ServiceInstances[ins.Service]
 
 	for _, instance := range instances {
 		if instance.Name == ins.Name {
@@ -101,12 +102,12 @@ func (c *Controller) RegisterServiceInstance(ins *service.Instance) error {
 		}
 	}
 
-	c.serviceInstances[ins.Service] = append(instances, ins)
+	c.ServiceInstances[ins.Service] = append(instances, ins)
 
 	c.dispatcher.dispatch(NewAddInstanceEvent(ins))
 	return nil
 }
 
-func (c *Controller) AddListener(typ string, listener eventListener) {
+func (c *Controller) AddListener(typ string, listener EventListener) {
 	c.dispatcher.addListener(typ, listener)
 }

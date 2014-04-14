@@ -58,7 +58,7 @@ func TestRPC(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	sName := "TestService"
+	sName := "test service"
 	localAddr := "127.0.0.1:8080"
 	remoteAddr := ts.Listener.Addr().String()
 
@@ -88,10 +88,7 @@ func TestRPC(t *testing.T) {
 }
 
 func prepareRouterByRPC(routerAddr, sName, localAddr, remoteAddr string) error {
-	mapTo, err := rmtService.NewInstance("test instance", "test", remoteAddr)
-	if err != nil {
-		return err
-	}
+	mapTo := rmtService.NewInstance("test instance", "test service", remoteAddr)
 
 	//client, err := rpc.DialHTTP("tcp", routerAddr)
 	client, err := rpc.Dial("tcp", routerAddr)
@@ -113,8 +110,7 @@ func prepareRouterByRPC(routerAddr, sName, localAddr, remoteAddr string) error {
 	}
 
 	iArgs := &InstanceArgs{
-		ServiceName: sName,
-		Instance:    mapTo,
+		Instance: mapTo,
 	}
 
 	err = client.Call("RouterRPC.AddServiceInstance", iArgs, nil)

@@ -38,15 +38,15 @@ func TestRegisterRouter(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Empty(t, c.routers)
+	assert.Empty(t, c.Routers)
 
 	err = c.RegisterRouter(cr)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, len(c.routers), 1)
-	assert.Equal(t, c.routers["test router"], cr)
+	assert.Equal(t, len(c.Routers), 1)
+	assert.Equal(t, c.Routers["test router"], cr)
 
 	err = c.RegisterRouter(cr)
 	assert.NotNil(t, err)
@@ -67,10 +67,7 @@ func TestRegisterServiceInstance(t *testing.T) {
 		time.Sleep(time.Millisecond * 50)
 	}()
 
-	ins, err := service.NewInstance("test instance", "test service", ":8888")
-	if err != nil {
-		t.Fatal(err)
-	}
+	ins := service.NewInstance("test instance", "test service", ":8888")
 
 	cAddr := "127.0.0.1:14818"
 	c, err := New(cAddr)

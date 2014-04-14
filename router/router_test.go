@@ -28,10 +28,7 @@ func TestRouter(t *testing.T) {
 
 	remoteAddr := ts.Listener.Addr().String()
 
-	mapTo, err := rmtService.NewInstance("test instance", "test", remoteAddr)
-	if err != nil {
-		t.Fatal(err)
-	}
+	mapTo := rmtService.NewInstance("test instance", "test", remoteAddr)
 
 	r, err := New(routerAddr)
 	if err != nil {

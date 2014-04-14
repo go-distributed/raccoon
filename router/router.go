@@ -15,6 +15,8 @@ type Router interface {
 	AddService(sName, localAddr string, policy Policy) error
 	RemoveService(sName string) error
 	SetServicePolicy(sName string, policy Policy) error
+	// TODO: remove first argument 'sName'.
+	// instance contains service name already.
 	AddServiceInstance(sName string, instance *rmtService.Instance) error
 	RemoveServiceInstance(sName string, instance *rmtService.Instance) error
 }
@@ -70,8 +72,18 @@ func (r *router) Start() (err error) {
 	return
 }
 
-func (r *router) Stop() error {
-	return r.listener.Close()
+func (r *router) Stop() (err error) {
+	for _, service := range r.services {
+		err = service.stop()
+		// TODO: safe roll back?
+		if err != nil {
+			return err
+		}
+	}
+
+	err = r.listener.Close()
+	return err
+
 }
 
 func (r *router) AddService(sName, localAddr string, policy Policy) error {

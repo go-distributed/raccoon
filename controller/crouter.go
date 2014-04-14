@@ -56,16 +56,14 @@ func (cr *CRouter) SetServicePolicy(sName string, policy router.Policy) error {
 
 func (cr *CRouter) AddServiceInstance(sName string, instance *service.Instance) error {
 	iArgs := &router.InstanceArgs{
-		ServiceName: sName,
-		Instance:    instance,
+		Instance: instance,
 	}
 	return cr.client.Call("RouterRPC.AddServiceInstance", iArgs, nil)
 }
 
 func (cr *CRouter) RemoveServiceInstance(sName string, instance *service.Instance) error {
 	iArgs := &router.InstanceArgs{
-		ServiceName: sName,
-		Instance:    instance,
+		Instance: instance,
 	}
 	return cr.client.Call("RouterRPC.RemoveServiceInstance", iArgs, nil)
 }

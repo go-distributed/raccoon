@@ -29,8 +29,7 @@ type ServiceReply struct {
 }
 
 type InstanceArgs struct {
-	ServiceName string
-	Instance    *rmtService.Instance
+	Instance *rmtService.Instance
 }
 
 type InstanceReply struct {
@@ -60,9 +59,9 @@ func (rpc *RouterRPC) SetServicePolicy(args *ServiceArgs, reply *ServiceReply) e
 }
 
 func (rpc *RouterRPC) AddServiceInstance(args *InstanceArgs, reply *InstanceReply) error {
-	return rpc.router.AddServiceInstance(args.ServiceName, args.Instance)
+	return rpc.router.AddServiceInstance(args.Instance.Service, args.Instance)
 }
 
 func (rpc *RouterRPC) RemoveServiceInstance(args *InstanceArgs, reply *InstanceReply) error {
-	return rpc.router.RemoveServiceInstance(args.ServiceName, args.Instance)
+	return rpc.router.RemoveServiceInstance(args.Instance.Service, args.Instance)
 }
