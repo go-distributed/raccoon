@@ -8,15 +8,6 @@ import (
 	rmtService "github.com/go-distributed/raccoon/service"
 )
 
-// TODO: discussion needed
-// When app calls AddService for router, how does it know which port to use?
-var ServicePortMap map[string]string
-
-func init() {
-	ServicePortMap = make(map[string]string)
-	ServicePortMap["test service"] = ":8080"
-}
-
 type instance struct {
 	remote  *rmtService.Instance
 	netAddr *net.TCPAddr

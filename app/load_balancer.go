@@ -8,6 +8,13 @@ import (
 	"github.com/go-distributed/raccoon/service"
 )
 
+var ServicePortMap map[string]string
+
+func init() {
+	ServicePortMap = make(map[string]string)
+	ServicePortMap["test service"] = ":8080"
+}
+
 type LoadBalancer struct {
 	Controller *controller.Controller
 }
@@ -30,7 +37,12 @@ func (lb *LoadBalancer) AddRouterListener(event controller.Event) {
 	r := lb.Controller.Routers[e.Id]
 
 	for service, instances := range lb.Controller.ServiceInstances {
-		err := r.AddService(service, router.ServicePortMap[service], router.NewRoundRobinPolicy())
+		port, ok := ServicePortMap[service]
+		if !ok {
+			log.Println("Unknown port for service:", service)
+			continue
+		}
+		err := r.AddService(service, port, router.NewRoundRobinPolicy())
 		if err != nil {
 			log.Println(err)
 		}
@@ -60,7 +72,13 @@ func (lb *LoadBalancer) AddInstanceListener(event controller.Event) {
 			Service: e.Service,
 		}
 
-		err := r.AddService(e.Service, router.ServicePortMap[e.Service], router.NewRoundRobinPolicy())
+		port, ok := ServicePortMap[e.Service]
+		if !ok {
+			log.Println("Unknown port for service:", e.Service)
+			continue
+		}
+		err := r.AddService(e.Service, port, router.NewRoundRobinPolicy())
+
 		if err != nil {
 			log.Println(err)
 		}
