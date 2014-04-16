@@ -2,7 +2,6 @@ package router
 
 import (
 	"fmt"
-	"net"
 	"sync"
 
 	"github.com/go-distributed/raccoon/instance"
@@ -46,6 +45,7 @@ func (s *service) addInstance(remote *instance.Instance) error {
 		return fmt.Errorf("instance '%s' already exists", remote.Name)
 	}
 
+	remote.NewStats()
 	s.instances = append(s.instances, remote)
 	return nil
 }
@@ -71,16 +71,11 @@ func (s *service) removeInstance(remote *instance.Instance) error {
 	return nil
 }
 
-func (s *service) selectInstanceAddr() (*net.TCPAddr, error) {
+func (s *service) selectInstanceAddr() (*instance.Instance, error) {
 	s.RLock()
 	defer s.RUnlock()
 
-	raddr, err := s.doSelection(s.instances)
-	if err != nil {
-		return nil, err
-	}
-
-	return raddr, nil
+	return s.doSelection(s.instances)
 }
 
 func (s *service) isInstanceExist(ins *instance.Instance) bool {
