@@ -3,13 +3,12 @@ package router
 import (
 	"fmt"
 	"math/rand"
-	"net"
 
 	"github.com/go-distributed/raccoon/instance"
 )
 
 type selector interface {
-	doSelection(instances []*instance.Instance) (*net.TCPAddr, error)
+	doSelection(instances []*instance.Instance) (*instance.Instance, error)
 }
 
 func newSelector(policy Policy) (selector, error) {
@@ -29,12 +28,12 @@ type randomSelector struct{}
 
 // defaultSelector randomly select a remote address from the proxy
 // remote address list.
-func (s *randomSelector) doSelection(instances []*instance.Instance) (*net.TCPAddr, error) {
+func (s *randomSelector) doSelection(instances []*instance.Instance) (*instance.Instance, error) {
 	if len(instances) == 0 {
 		return nil, fmt.Errorf("No service instance exists")
 	}
 	which := rand.Int() % len(instances)
-	return instances[which].Addr, nil
+	return instances[which], nil
 }
 
 type roundRounbinSelector struct {
@@ -45,12 +44,12 @@ func newRoundbinSelector() *roundRounbinSelector {
 	return new(roundRounbinSelector)
 }
 
-func (s *roundRounbinSelector) doSelection(instances []*instance.Instance) (*net.TCPAddr, error) {
+func (s *roundRounbinSelector) doSelection(instances []*instance.Instance) (*instance.Instance, error) {
 	if len(instances) == 0 {
 		return nil, fmt.Errorf("No service instance exists")
 	}
 
 	which := s.counter % uint32(len(instances))
 	s.counter++
-	return instances[which].Addr, nil
+	return instances[which], nil
 }

@@ -18,7 +18,7 @@ func newConnector(one io.ReadWriteCloser, other io.ReadWriteCloser) *connector {
 
 func (c *connector) connect() {
 	go io.Copy(c.one, c.other)
-	go io.Copy(c.other, c.one)
+	io.Copy(c.other, c.one)
 }
 
 func (c *connector) disconnect() {

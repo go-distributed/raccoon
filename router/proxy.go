@@ -68,14 +68,14 @@ func (p *proxy) start() error {
 		}
 
 		go func(one net.Conn) {
-			raddr, err := p.service.selectInstanceAddr()
+			i, err := p.service.selectInstanceAddr()
 
 			if err != nil {
 				log.Println(err)
 				return
 			}
 
-			other, err := net.Dial("tcp", raddr.String())
+			other, err := net.Dial("tcp", i.Addr.String())
 			if err != nil {
 				log.Println(err)
 				return
@@ -86,6 +86,10 @@ func (p *proxy) start() error {
 				log.Println(err)
 				return
 			}
+
+			i.Stats().IncTotal()
+			i.Stats().IncCurr(1)
+			defer i.Stats().IncCurr(-1)
 
 			c.connect()
 		}(one)
