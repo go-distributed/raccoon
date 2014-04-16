@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	rmtService "github.com/go-distributed/raccoon/service"
+	"github.com/go-distributed/raccoon/instance"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -88,7 +88,10 @@ func TestRPC(t *testing.T) {
 }
 
 func prepareRouterByRPC(routerAddr, sName, localAddr, remoteAddr string) error {
-	mapTo := rmtService.NewInstance("test instance", "test service", remoteAddr)
+	mapTo, err := instance.NewInstance("test instance", "test service", remoteAddr)
+	if err != nil {
+		return err
+	}
 
 	//client, err := rpc.DialHTTP("tcp", routerAddr)
 	client, err := rpc.Dial("tcp", routerAddr)

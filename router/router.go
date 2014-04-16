@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	rmtService "github.com/go-distributed/raccoon/service"
+	"github.com/go-distributed/raccoon/instance"
 )
 
 type Router interface {
@@ -17,8 +17,8 @@ type Router interface {
 	SetServicePolicy(sName string, policy Policy) error
 	// TODO: remove first argument 'sName'.
 	// instance contains service name already.
-	AddServiceInstance(sName string, instance *rmtService.Instance) error
-	RemoveServiceInstance(sName string, instance *rmtService.Instance) error
+	AddServiceInstance(sName string, instance *instance.Instance) error
+	RemoveServiceInstance(sName string, instance *instance.Instance) error
 }
 
 type router struct {
@@ -144,7 +144,7 @@ func (r *router) SetServicePolicy(sName string, policy Policy) error {
 	return nil
 }
 
-func (r *router) AddServiceInstance(sName string, instance *rmtService.Instance) error {
+func (r *router) AddServiceInstance(sName string, instance *instance.Instance) error {
 	r.Lock()
 	s, ok := r.services[sName]
 	r.Unlock()
@@ -161,7 +161,7 @@ func (r *router) AddServiceInstance(sName string, instance *rmtService.Instance)
 	return nil
 }
 
-func (r *router) RemoveServiceInstance(sName string, instance *rmtService.Instance) error {
+func (r *router) RemoveServiceInstance(sName string, instance *instance.Instance) error {
 	r.Lock()
 	s, ok := r.services[sName]
 	r.Unlock()

@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-distributed/raccoon/controller"
 	"github.com/go-distributed/raccoon/router"
-	"github.com/go-distributed/raccoon/service"
 )
 
 var ServicePortMap map[string]string
@@ -66,24 +65,20 @@ func (lb *LoadBalancer) AddInstanceListener(event controller.Event) {
 
 	e := event.(*controller.AddInstanceEvent)
 	for _, r := range lb.Controller.Routers {
-		instance := &service.Instance{
-			Addr:    e.Addr,
-			Name:    e.Name,
-			Service: e.Service,
-		}
+		instance := e.Instance
 
-		port, ok := ServicePortMap[e.Service]
+		port, ok := ServicePortMap[instance.Service]
 		if !ok {
-			log.Println("Unknown port for service:", e.Service)
+			log.Println("Unknown port for service:", instance.Service)
 			continue
 		}
-		err := r.AddService(e.Service, port, router.NewRoundRobinPolicy())
+		err := r.AddService(instance.Service, port, router.NewRoundRobinPolicy())
 
 		if err != nil {
 			log.Println(err)
 		}
 
-		err = r.AddServiceInstance(e.Service, instance)
+		err = r.AddServiceInstance(instance.Service, instance)
 		if err != nil {
 			log.Println(err)
 		}

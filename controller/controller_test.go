@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-distributed/raccoon/instance"
 	"github.com/go-distributed/raccoon/router"
-	"github.com/go-distributed/raccoon/service"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -67,7 +67,10 @@ func TestRegisterServiceInstance(t *testing.T) {
 		time.Sleep(time.Millisecond * 50)
 	}()
 
-	ins := service.NewInstance("test instance", "test service", ":8888")
+	ins, err := instance.NewInstance("test instance", "test service", ":8888")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	cAddr := "127.0.0.1:14818"
 	c, err := New(cAddr)

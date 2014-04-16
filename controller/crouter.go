@@ -4,8 +4,8 @@ import (
 	"encoding/gob"
 	"net/rpc"
 
+	"github.com/go-distributed/raccoon/instance"
 	"github.com/go-distributed/raccoon/router"
-	"github.com/go-distributed/raccoon/service"
 )
 
 type CRouter struct {
@@ -54,14 +54,14 @@ func (cr *CRouter) SetServicePolicy(sName string, policy router.Policy) error {
 	return cr.client.Call("RouterRPC.SetServicePolicy", sArgs, nil)
 }
 
-func (cr *CRouter) AddServiceInstance(sName string, instance *service.Instance) error {
+func (cr *CRouter) AddServiceInstance(sName string, instance *instance.Instance) error {
 	iArgs := &router.InstanceArgs{
 		Instance: instance,
 	}
 	return cr.client.Call("RouterRPC.AddServiceInstance", iArgs, nil)
 }
 
-func (cr *CRouter) RemoveServiceInstance(sName string, instance *service.Instance) error {
+func (cr *CRouter) RemoveServiceInstance(sName string, instance *instance.Instance) error {
 	iArgs := &router.InstanceArgs{
 		Instance: instance,
 	}
