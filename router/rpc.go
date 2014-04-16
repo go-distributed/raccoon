@@ -1,7 +1,7 @@
 package router
 
 import (
-	rmtService "github.com/go-distributed/raccoon/service"
+	"github.com/go-distributed/raccoon/instance"
 )
 
 type Status int
@@ -29,7 +29,7 @@ type ServiceReply struct {
 }
 
 type InstanceArgs struct {
-	Instance *rmtService.Instance
+	Instance *instance.Instance
 }
 
 type InstanceReply struct {

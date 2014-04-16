@@ -1,6 +1,6 @@
 package controller
 
-import "github.com/go-distributed/raccoon/service"
+import "github.com/go-distributed/raccoon/instance"
 
 const (
 	AddRouterEventType   = "AddRouterEvent"
@@ -28,17 +28,11 @@ func (e *AddRouterEvent) Type() string {
 }
 
 type AddInstanceEvent struct {
-	Name    string
-	Service string
-	Addr    string
+	Instance *instance.Instance
 }
 
-func NewAddInstanceEvent(i *service.Instance) *AddInstanceEvent {
-	return &AddInstanceEvent{
-		Name:    i.Name,
-		Service: i.Service,
-		Addr:    i.Addr,
-	}
+func NewAddInstanceEvent(i *instance.Instance) *AddInstanceEvent {
+	return &AddInstanceEvent{i}
 }
 
 func (e *AddInstanceEvent) Type() string {

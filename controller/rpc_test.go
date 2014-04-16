@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-distributed/raccoon/instance"
 	"github.com/go-distributed/raccoon/router"
-	"github.com/go-distributed/raccoon/service"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -57,7 +57,10 @@ func TestRPC(t *testing.T) {
 	assert.Equal(t, len(c.Routers), 1)
 	assert.NotNil(t, c.Routers["test router"])
 
-	mapTo := service.NewInstance("test instance", "test service", ":8888")
+	mapTo, err := instance.NewInstance("test instance", "test service", ":8888")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	regInstanceArgs := &RegInstanceArgs{
 		Instance: mapTo,

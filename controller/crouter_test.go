@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/go-distributed/raccoon/instance"
 	"github.com/go-distributed/raccoon/router"
-	"github.com/go-distributed/raccoon/service"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -39,7 +39,10 @@ func TestCRouter(t *testing.T) {
 	localAddr := "127.0.0.1:8080"
 	remoteAddr := ts.Listener.Addr().String()
 
-	mapTo := service.NewInstance("test instance", sName, remoteAddr)
+	mapTo, err := instance.NewInstance("test instance", sName, remoteAddr)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// setting up service
 	err = cr.AddService(sName, localAddr, router.NewRandomSelectPolicy())

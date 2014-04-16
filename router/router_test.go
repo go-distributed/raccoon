@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	rmtService "github.com/go-distributed/raccoon/service"
+	"github.com/go-distributed/raccoon/instance"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,7 +28,10 @@ func TestRouter(t *testing.T) {
 
 	remoteAddr := ts.Listener.Addr().String()
 
-	mapTo := rmtService.NewInstance("test instance", "test", remoteAddr)
+	mapTo, err := instance.NewInstance("test instance", "test", remoteAddr)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	r, err := New(routerAddr)
 	if err != nil {

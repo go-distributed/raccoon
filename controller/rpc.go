@@ -1,6 +1,6 @@
 package controller
 
-import "github.com/go-distributed/raccoon/service"
+import "github.com/go-distributed/raccoon/instance"
 
 type Status int
 
@@ -17,7 +17,7 @@ type RegRouterReply struct {
 }
 
 type RegInstanceArgs struct {
-	Instance *service.Instance
+	Instance *instance.Instance
 }
 
 type RegInstanceReply struct {

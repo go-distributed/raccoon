@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/go-distributed/raccoon/controller"
+	"github.com/go-distributed/raccoon/instance"
 	"github.com/go-distributed/raccoon/router"
-	"github.com/go-distributed/raccoon/service"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,7 +33,10 @@ func testLBFunction(t *testing.T, option int) {
 	defer ts.Close()
 	remoteAddr := ts.Listener.Addr().String()
 
-	mapTo := service.NewInstance("test instance", sName, remoteAddr)
+	mapTo, err := instance.NewInstance("test instance", sName, remoteAddr)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	rAddr := "127.0.0.1:14817"
 	r, err := router.New(rAddr)
@@ -60,7 +63,7 @@ func testLBFunction(t *testing.T, option int) {
 	case 0:
 		c.AddListener(controller.AddRouterEventType, lb.AddRouterListener)
 
-		instances := make([]*service.Instance, 0)
+		instances := make([]*instance.Instance, 0)
 		c.ServiceInstances[sName] = append(instances, mapTo)
 
 		c.RegisterRouter(cr)

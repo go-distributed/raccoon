@@ -5,35 +5,17 @@ import (
 	"net"
 	"sync"
 
-	rmtService "github.com/go-distributed/raccoon/service"
+	"github.com/go-distributed/raccoon/instance"
 )
-
-type instance struct {
-	remote  *rmtService.Instance
-	netAddr *net.TCPAddr
-}
 
 type service struct {
 	name      string
 	policy    Policy
 	proxy     *proxy
-	instances []*instance
+	instances []*instance.Instance
 
 	selector
 	sync.RWMutex
-}
-
-func newInstance(remote *rmtService.Instance) (*instance, error) {
-	netAddr, err := net.ResolveTCPAddr("tcp", remote.Addr)
-	if err != nil {
-		return nil, err
-	}
-
-	ins := &instance{
-		remote:  remote,
-		netAddr: netAddr,
-	}
-	return ins, nil
 }
 
 func newService(name string, localAddr string, policy Policy) (s *service, err error) {
@@ -44,7 +26,7 @@ func newService(name string, localAddr string, policy Policy) (s *service, err e
 
 	s = &service{
 		name:      name,
-		instances: make([]*instance, 0),
+		instances: make([]*instance.Instance, 0),
 		selector:  selector,
 	}
 
@@ -56,7 +38,7 @@ func newService(name string, localAddr string, policy Policy) (s *service, err e
 	return s, nil
 }
 
-func (s *service) addInstance(remote *rmtService.Instance) error {
+func (s *service) addInstance(remote *instance.Instance) error {
 	s.Lock()
 	defer s.Unlock()
 
@@ -64,16 +46,11 @@ func (s *service) addInstance(remote *rmtService.Instance) error {
 		return fmt.Errorf("instance '%s' already exists", remote.Name)
 	}
 
-	ins, err := newInstance(remote)
-	if err != nil {
-		return err
-	}
-
-	s.instances = append(s.instances, ins)
+	s.instances = append(s.instances, remote)
 	return nil
 }
 
-func (s *service) removeInstance(remote *rmtService.Instance) error {
+func (s *service) removeInstance(remote *instance.Instance) error {
 	s.Lock()
 	defer s.Unlock()
 
@@ -81,10 +58,10 @@ func (s *service) removeInstance(remote *rmtService.Instance) error {
 		return fmt.Errorf("instance '%s' does not exist", remote.Name)
 	}
 
-	newInstances := make([]*instance, len(s.instances)-1)
+	newInstances := make([]*instance.Instance, len(s.instances)-1)
 	i := 0
 	for _, ours := range s.instances {
-		if ours.remote.Name != remote.Name {
+		if ours.Name != remote.Name {
 			newInstances[i] = ours
 			i++
 		}
@@ -106,14 +83,15 @@ func (s *service) selectInstanceAddr() (*net.TCPAddr, error) {
 	return raddr, nil
 }
 
-func (s *service) isInstanceExist(rmtInstance *rmtService.Instance) bool {
+func (s *service) isInstanceExist(ins *instance.Instance) bool {
 	for _, ours := range s.instances {
-		if ours.remote.Name == rmtInstance.Name {
+		if ours.Name == ins.Name {
 			return true
 		}
 	}
 	return false
 }
+
 func (s *service) setPolicy(policy Policy) error {
 	selector, err := newSelector(policy)
 	if err != nil {
