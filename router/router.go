@@ -19,6 +19,7 @@ type Router interface {
 	// instance contains service name already.
 	AddServiceInstance(sName string, instance *instance.Instance) error
 	RemoveServiceInstance(sName string, instance *instance.Instance) error
+	GetServiceInstances(name string) (*[]*instance.Instance, error)
 }
 
 type router struct {
@@ -176,4 +177,25 @@ func (r *router) RemoveServiceInstance(sName string, instance *instance.Instance
 	}
 
 	return nil
+}
+
+func (r *router) GetServiceInstances(name string) (*[]*instance.Instance, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	s, err := r.service(name)
+	if err != nil {
+		return nil, err
+	}
+	is := s.Instances()
+
+	return &is, nil
+}
+
+func (r *router) service(name string) (*service, error) {
+	s, ok := r.services[name]
+	if !ok {
+		return nil, fmt.Errorf("service %s does not exist", name)
+	}
+	return s, nil
 }

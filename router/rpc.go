@@ -65,3 +65,13 @@ func (rpc *RouterRPC) AddServiceInstance(args *InstanceArgs, reply *InstanceRepl
 func (rpc *RouterRPC) RemoveServiceInstance(args *InstanceArgs, reply *InstanceReply) error {
 	return rpc.router.RemoveServiceInstance(args.Instance.Service, args.Instance)
 }
+
+func (rpc *RouterRPC) GetServiceInstances(args string, reply *[]*instance.Instance) error {
+	is, err := rpc.router.GetServiceInstances(args)
+	if err != nil {
+		return err
+	}
+	reply = is
+
+	return nil
+}

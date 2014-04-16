@@ -68,7 +68,7 @@ func (p *proxy) start() error {
 		}
 
 		go func(one net.Conn) {
-			i, err := p.service.selectInstanceAddr()
+			i, err := p.service.selectInstance()
 
 			if err != nil {
 				log.Println(err)
@@ -87,9 +87,9 @@ func (p *proxy) start() error {
 				return
 			}
 
-			i.Stats().IncTotal()
-			i.Stats().IncCurr(1)
-			defer i.Stats().IncCurr(-1)
+			i.Stats.IncTotal()
+			i.Stats.IncCurr(1)
+			defer i.Stats.IncCurr(-1)
 
 			c.connect()
 		}(one)
