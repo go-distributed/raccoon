@@ -8,25 +8,29 @@ import (
 )
 
 type service struct {
-	name      string
-	policy    Policy
-	proxy     *proxy
-	instances []*instance.Instance
+	name              string
+	policy            Policy
+	proxy             *proxy
+	instances         []*instance.Instance
+	failureChan       chan *instance.Instance
+	routerFailureChan chan *instance.Instance
 
 	selector
 	sync.RWMutex
 }
 
-func newService(name string, localAddr string, policy Policy) (s *service, err error) {
+func newService(name string, localAddr string, policy Policy, c chan *instance.Instance) (s *service, err error) {
 	selector, err := newSelector(policy)
 	if err != nil {
 		return nil, err
 	}
 
 	s = &service{
-		name:      name,
-		instances: make([]*instance.Instance, 0),
-		selector:  selector,
+		name:              name,
+		instances:         make([]*instance.Instance, 0),
+		selector:          selector,
+		failureChan:       make(chan *instance.Instance, 256),
+		routerFailureChan: c,
 	}
 
 	s.proxy, err = newProxy(localAddr, s)
@@ -112,10 +116,21 @@ func (s *service) setPolicy(policy Policy) error {
 
 func (s *service) start() error {
 	err := s.proxy.start()
-	return err
+	if err != nil {
+		return err
+	}
+
+	go s.monitorFaliure(s.routerFailureChan)
+	return nil
 }
 
 func (s *service) stop() error {
 	err := s.proxy.stop()
 	return err
+}
+
+func (s *service) monitorFaliure(c chan *instance.Instance) {
+	for i := range s.failureChan {
+		c <- i
+	}
 }

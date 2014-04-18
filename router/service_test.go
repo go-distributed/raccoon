@@ -35,7 +35,7 @@ func TestService(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	s, err := newService("name", localAddr, NewRandomSelectPolicy())
+	s, err := newService("name", localAddr, NewRandomSelectPolicy(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}

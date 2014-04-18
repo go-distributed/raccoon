@@ -23,16 +23,18 @@ type Router interface {
 }
 
 type router struct {
-	services map[string]*service
-	listener net.Listener
-	addr     *net.TCPAddr
-	server   *rpc.Server
+	services    map[string]*service
+	listener    net.Listener
+	addr        *net.TCPAddr
+	server      *rpc.Server
+	failureChan chan *instance.Instance
 	sync.Mutex
 }
 
 func New(addrStr string) (*router, error) {
 	r := &router{
-		services: make(map[string]*service),
+		services:    make(map[string]*service),
+		failureChan: make(chan *instance.Instance, 256),
 	}
 
 	var err error
@@ -70,6 +72,8 @@ func (r *router) Start() (err error) {
 		}
 	}()
 
+	go r.monitorFaliure()
+
 	return
 }
 
@@ -96,7 +100,7 @@ func (r *router) AddService(sName, localAddr string, policy Policy) error {
 		return fmt.Errorf("service '%s' already exists", sName)
 	}
 
-	s, err := newService(sName, localAddr, policy)
+	s, err := newService(sName, localAddr, policy, r.failureChan)
 	if err != nil {
 		return err
 	}
@@ -198,4 +202,10 @@ func (r *router) service(name string) (*service, error) {
 		return nil, fmt.Errorf("service %s does not exist", name)
 	}
 	return s, nil
+}
+
+func (r *router) monitorFaliure() {
+	for i := range r.failureChan {
+		fmt.Println(i.Name + "failed")
+	}
 }
