@@ -108,6 +108,10 @@ func (c *Controller) RegisterServiceInstance(ins *instance.Instance) error {
 	return nil
 }
 
+func (c *Controller) ReportFailure(reporter string, ins *instance.Instance) {
+	c.dispatcher.dispatch(NewFailureInstanceEvent(reporter, ins))
+}
+
 func (c *Controller) AddListener(typ string, listener EventListener) {
 	c.dispatcher.addListener(typ, listener)
 }

@@ -3,9 +3,10 @@ package controller
 import "github.com/go-distributed/raccoon/instance"
 
 const (
-	AddRouterEventType   = "AddRouterEvent"
-	AddInstanceEventType = "AddInstanceEvent"
-	RmInstanceEventType  = "RemoveInstanceEvent"
+	AddRouterEventType       = "AddRouterEvent"
+	AddInstanceEventType     = "AddInstanceEvent"
+	RmInstanceEventType      = "RemoveInstanceEvent"
+	FailureInstanceEventType = "FailureInstanceEvent"
 )
 
 type Event interface {
@@ -50,4 +51,17 @@ func NewRmInstanceEvent(i *instance.Instance) *RmInstanceEvent {
 
 func (e *RmInstanceEvent) Type() string {
 	return RmInstanceEventType
+}
+
+type FailureInstanceEvnet struct {
+	reporter string
+	instance *instance.Instance
+}
+
+func NewFailureInstanceEvent(reporter string, i *instance.Instance) *FailureInstanceEvnet {
+	return &FailureInstanceEvnet{reporter, i}
+}
+
+func (e *FailureInstanceEvnet) Type() string {
+	return FailureInstanceEventType
 }
