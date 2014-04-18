@@ -8,7 +8,7 @@ type Instance struct {
 	Addr    *net.TCPAddr
 	Name    string
 	Service string
-	stats   *Stats
+	Stats   *Stats
 }
 
 func NewInstance(name, service, addrStr string) (*Instance, error) {
@@ -21,14 +21,10 @@ func NewInstance(name, service, addrStr string) (*Instance, error) {
 		Name:    name,
 		Service: service,
 		Addr:    addr,
-		stats:   new(Stats),
+		Stats:   new(Stats),
 	}, nil
 }
 
-func (i *Instance) Stats() *Stats {
-	return i.stats
-}
-
 func (i *Instance) NewStats() {
-	i.stats = new(Stats)
+	i.Stats = new(Stats)
 }

@@ -71,7 +71,20 @@ func (s *service) removeInstance(remote *instance.Instance) error {
 	return nil
 }
 
-func (s *service) selectInstanceAddr() (*instance.Instance, error) {
+func (s *service) Instances() []*instance.Instance {
+	s.RLock()
+	defer s.Unlock()
+
+	is := make([]*instance.Instance, len(s.instances))
+
+	for i := range s.instances {
+		is[i] = s.instances[i]
+	}
+
+	return is
+}
+
+func (s *service) selectInstance() (*instance.Instance, error) {
 	s.RLock()
 	defer s.RUnlock()
 

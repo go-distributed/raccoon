@@ -5,21 +5,21 @@ import (
 )
 
 type Stats struct {
-	totalCount   int
-	currentCount int
-	sync.Mutex
+	TotalCount   int
+	CurrentCount int
+	l            sync.Mutex
 }
 
 func (s *Stats) IncTotal() {
-	s.Lock()
-	defer s.Unlock()
+	s.l.Lock()
+	defer s.l.Unlock()
 
-	s.totalCount++
+	s.TotalCount++
 }
 
 func (s *Stats) IncCurr(d int) {
-	s.Lock()
-	defer s.Unlock()
+	s.l.Lock()
+	defer s.l.Unlock()
 
-	s.currentCount = s.currentCount + d
+	s.CurrentCount = s.CurrentCount + d
 }

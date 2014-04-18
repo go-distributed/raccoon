@@ -67,3 +67,10 @@ func (cr *CRouter) RemoveServiceInstance(sName string, instance *instance.Instan
 	}
 	return cr.client.Call("RouterRPC.RemoveServiceInstance", iArgs, nil)
 }
+
+func (cr *CRouter) GetServiceInstances(name string) (*[]*instance.Instance, error) {
+	ins := make([]*instance.Instance, 0)
+	pIns := &ins
+	err := cr.client.Call("RouterPRC.GetServiceInstances", name, pIns)
+	return pIns, err
+}
