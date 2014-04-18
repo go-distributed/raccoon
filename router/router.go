@@ -28,10 +28,12 @@ type router struct {
 	addr        *net.TCPAddr
 	server      *rpc.Server
 	failureChan chan *instance.Instance
+
+	controllerAddr *net.TCPAddr
 	sync.Mutex
 }
 
-func New(addrStr string) (*router, error) {
+func New(addrStr string, controllerAddr string) (*router, error) {
 	r := &router{
 		services:    make(map[string]*service),
 		failureChan: make(chan *instance.Instance, 256),
@@ -41,6 +43,13 @@ func New(addrStr string) (*router, error) {
 	r.addr, err = net.ResolveTCPAddr("tcp", addrStr)
 	if err != nil {
 		return nil, err
+	}
+
+	if controllerAddr != "" {
+		r.controllerAddr, err = net.ResolveTCPAddr("tcp", controllerAddr)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return r, nil
@@ -206,6 +215,13 @@ func (r *router) service(name string) (*service, error) {
 
 func (r *router) monitorFaliure() {
 	for i := range r.failureChan {
-		fmt.Println(i.Name + "failed")
+		c, err := rpc.Dial("tcp", r.controllerAddr.String())
+		if err != nil {
+			log.Println(err)
+		}
+		defer c.Close()
+
+		args := &ReportFailureArgs{r.addr.String(), i}
+		c.Call("serviceMethod", args, nil)
 	}
 }

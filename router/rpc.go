@@ -75,3 +75,8 @@ func (rpc *RouterRPC) GetServiceInstances(args string, reply *[]*instance.Instan
 
 	return nil
 }
+
+type ReportFailureArgs struct {
+	reporter string
+	instance *instance.Instance
+}
