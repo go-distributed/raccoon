@@ -84,6 +84,7 @@ func (c *Controller) RegisterRouter(cr *CRouter) error {
 		return fmt.Errorf("router '%s' already exists", cr.id)
 	}
 
+	log.Println("Router registered:", cr.id, cr.addr)
 	c.Routers[cr.id] = cr
 
 	c.dispatcher.dispatch(NewAddRouterEvent(cr.id, cr.addr))

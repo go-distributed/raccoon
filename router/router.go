@@ -206,6 +206,7 @@ func (r *router) service(name string) (*service, error) {
 
 func (r *router) monitorFaliure() {
 	for i := range r.failureChan {
+		// TODO: Report to controller
 		fmt.Println(i.Name + "failed")
 	}
 }
