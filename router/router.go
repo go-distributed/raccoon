@@ -215,13 +215,17 @@ func (r *router) service(name string) (*service, error) {
 
 func (r *router) monitorFaliure() {
 	for i := range r.failureChan {
-		c, err := rpc.Dial("tcp", r.controllerAddr.String())
-		if err != nil {
-			log.Println(err)
-		}
-		defer c.Close()
-
-		args := &ReportFailureArgs{r.addr.String(), i}
-		c.Call("serviceMethod", args, nil)
+		r.ReportFailure(i)
 	}
+}
+
+func (r *router) ReportFailure(i *instance.Instance) {
+	c, err := rpc.Dial("tcp", r.controllerAddr.String())
+	if err != nil {
+		log.Println(err)
+	}
+	defer c.Close()
+
+	args := &ReportFailureArgs{r.addr.String(), i}
+	c.Call("serviceMethod", args, nil)
 }
