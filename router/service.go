@@ -45,7 +45,6 @@ func (s *service) addInstance(remote *instance.Instance) error {
 		return fmt.Errorf("instance '%s' already exists", remote.Name)
 	}
 
-	remote.NewStats()
 	s.instances = append(s.instances, remote)
 	return nil
 }

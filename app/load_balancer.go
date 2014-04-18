@@ -84,3 +84,20 @@ func (lb *LoadBalancer) AddInstanceListener(event controller.Event) {
 		}
 	}
 }
+
+func (lb *LoadBalancer) RmInstanceListener(event controller.Event) {
+	if event.Type() != controller.RmInstanceEventType {
+		panic("")
+	}
+
+	e := event.(*controller.RmInstanceEvent)
+
+	for _, r := range lb.Controller.Routers {
+		instance := e.Instance
+
+		err := r.RemoveServiceInstance(instance.Service, instance)
+		if err != nil {
+			log.Println(err)
+		}
+	}
+}

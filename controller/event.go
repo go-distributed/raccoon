@@ -5,6 +5,7 @@ import "github.com/go-distributed/raccoon/instance"
 const (
 	AddRouterEventType   = "AddRouterEvent"
 	AddInstanceEventType = "AddInstanceEvent"
+	RmInstanceEventType  = "RemoveInstanceEvent"
 )
 
 type Event interface {
@@ -37,4 +38,16 @@ func NewAddInstanceEvent(i *instance.Instance) *AddInstanceEvent {
 
 func (e *AddInstanceEvent) Type() string {
 	return AddInstanceEventType
+}
+
+type RmInstanceEvent struct {
+	Instance *instance.Instance
+}
+
+func NewRmInstanceEvent(i *instance.Instance) *RmInstanceEvent {
+	return &RmInstanceEvent{i}
+}
+
+func (e *RmInstanceEvent) Type() string {
+	return RmInstanceEventType
 }
