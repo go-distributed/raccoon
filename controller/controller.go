@@ -84,7 +84,7 @@ func (c *Controller) RegisterRouter(cr *CRouter) error {
 		return fmt.Errorf("router '%s' already exists", cr.id)
 	}
 
-	log.Println("Router registered:", cr.id, cr.addr)
+	log.Printf("Router registered: '%v', '%v'\n", cr.id, cr.addr)
 	c.Routers[cr.id] = cr
 
 	c.dispatcher.dispatch(NewAddRouterEvent(cr.id, cr.addr))
@@ -103,6 +103,7 @@ func (c *Controller) RegisterServiceInstance(ins *instance.Instance) error {
 		}
 	}
 
+	log.Printf("Instance registered: '%v', '%v', '%v'\n", ins.Name, ins.Service, ins.Addr)
 	c.ServiceInstances[ins.Service] = append(instances, ins)
 
 	c.dispatcher.dispatch(NewAddInstanceEvent(ins))

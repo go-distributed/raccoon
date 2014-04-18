@@ -15,11 +15,14 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
+	"net/http/httptest"
 	"net/rpc"
 	"os"
 	"strings"
 
 	"github.com/go-distributed/raccoon/controller"
+	"github.com/go-distributed/raccoon/instance"
 	"github.com/go-distributed/raccoon/router"
 )
 
@@ -40,7 +43,7 @@ func plotController() error {
 
 func plotRouter() error {
 	if len(os.Args) < 5 {
-		return fmt.Errorf("Usage: demo r <cAddr> <rAddr> id")
+		return fmt.Errorf("Usage: demo r <cAddr> <rAddr> <id>")
 	}
 
 	cAddr := os.Args[2]
@@ -78,15 +81,56 @@ func plotRouter() error {
 	//fmt.Println("debug:", regRouterArgs.Addr, cAddr)
 
 	err = client.Call("ControllerRPC.RegisterRouter", regRouterArgs, nil)
+
+	return err
+}
+
+// Service: "http test server"
+func plotInstance() error {
+	if len(os.Args) < 4 {
+		return fmt.Errorf("Usage: demo i <cAddr> <id>")
+	}
+
+	cAddr := os.Args[2]
+	id := os.Args[3]
+	service := "http test server"
+
+	// start http test server
+	expectedReply := []byte("hello, world")
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write(expectedReply)
+	}))
+
+	addr := ts.Listener.Addr().String()
+	port := addr[strings.Index(addr, ":"):]
+
+	addr, err := getInterfaceAddr()
 	if err != nil {
 		return err
 	}
 
-	return nil
-}
+	iAddr := addr + port
+	//fmt.Println("http address:", iAddr)
 
-func plotInstance() error {
-	panic("")
+	// create instance
+	instance, err := instance.NewInstance(id, service, iAddr)
+	if err != nil {
+		return err
+	}
+
+	// register instance to controller
+	regInstanceArgs := &controller.RegInstanceArgs{
+		Instance: instance,
+	}
+
+	client, err := rpc.Dial("tcp", cAddr)
+	if err != nil {
+		return err
+	}
+
+	err = client.Call("ControllerRPC.RegisterServiceInstance", regInstanceArgs, nil)
+
+	return err
 }
 
 func main() {
