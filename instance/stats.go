@@ -17,6 +17,8 @@ func (s *Stats) IncTotal() {
 	s.TotalCount++
 }
 
+// Current Count is used to keep records of current TCP connection.
+// This is useful for long session such as Database.
 func (s *Stats) IncCurr(d int) {
 	s.l.Lock()
 	defer s.l.Unlock()
