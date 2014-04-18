@@ -51,7 +51,7 @@ func plotRouter() error {
 	id := os.Args[4]
 
 	// start router
-	r, err := router.New(rAddr)
+	r, err := router.New(id, rAddr, cAddr)
 	if err != nil {
 		return err
 	}

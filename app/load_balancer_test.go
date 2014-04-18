@@ -39,7 +39,7 @@ func testLBFunction(t *testing.T, option int) {
 	}
 
 	rAddr := "127.0.0.1:14817"
-	r, err := router.New(rAddr, "")
+	r, err := router.New(rName, rAddr, "")
 	if err != nil {
 		t.Fatal(err)
 	}

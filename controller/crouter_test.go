@@ -16,14 +16,15 @@ import (
 var _ = fmt.Printf
 
 func TestCRouter(t *testing.T) {
-	r, _ := router.New(":14817", "")
+	rId := "test cRouter"
+	r, _ := router.New(rId, ":14817", "")
 	err := r.Start()
 	if err != nil {
 		t.Fatal("router start:", err)
 	}
 	defer r.Stop()
 
-	cr, err := NewCRouter("test cRouter", ":14817")
+	cr, err := NewCRouter(rId, ":14817")
 	if err != nil {
 		t.Fatal(err)
 	}
