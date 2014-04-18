@@ -16,7 +16,7 @@ import (
 func TestEcho(t *testing.T) {
 	routerAddr := "127.0.0.1:14817"
 
-	r, _ := New(routerAddr)
+	r, _ := New(routerAddr, "")
 	err := r.Start()
 	if err != nil {
 		t.Fatal("router start:", err)
@@ -42,7 +42,7 @@ func TestEcho(t *testing.T) {
 func TestRPC(t *testing.T) {
 	routerAddr := "127.0.0.1:14817"
 
-	r, _ := New(routerAddr)
+	r, _ := New(routerAddr, "")
 	err := r.Start()
 	if err != nil {
 		t.Fatal("router start:", err)
