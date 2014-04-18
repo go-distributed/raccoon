@@ -5,14 +5,17 @@ import (
 	"log"
 	"net"
 	"sync"
+
+	"github.com/go-distributed/raccoon/instance"
 )
 
 type proxy struct {
-	status     string
-	connectors []*connector
-	localAddr  *net.TCPAddr
-	listener   net.Listener
-	service    *service
+	status      string
+	connectors  []*connector
+	localAddr   *net.TCPAddr
+	listener    net.Listener
+	service     *service
+	failureChan chan *instance.Instance
 	sync.Mutex
 }
 
@@ -26,9 +29,10 @@ func newProxy(laddrStr string, s *service) (*proxy, error) {
 	var err error
 
 	p := &proxy{
-		connectors: make([]*connector, 0),
-		status:     initialized,
-		service:    s,
+		connectors:  make([]*connector, 0),
+		status:      initialized,
+		service:     s,
+		failureChan: make(chan *instance.Instance, 256),
 	}
 
 	if err != nil {
@@ -77,6 +81,11 @@ func (p *proxy) start() error {
 
 			other, err := net.Dial("tcp", i.Addr.String())
 			if err != nil {
+				select {
+				case p.failureChan <- i:
+				default:
+				}
+
 				log.Println(err)
 				return
 			}
