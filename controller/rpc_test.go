@@ -11,7 +11,7 @@ import (
 )
 
 func TestRPC(t *testing.T) {
-	r, err := router.New(":14817")
+	r, err := router.New(":14817", "")
 	if err != nil {
 		t.Fatal(err)
 	}

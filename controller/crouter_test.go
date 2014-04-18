@@ -16,7 +16,7 @@ import (
 var _ = fmt.Printf
 
 func TestCRouter(t *testing.T) {
-	r, _ := router.New(":14817")
+	r, _ := router.New(":14817", "")
 	err := r.Start()
 	if err != nil {
 		t.Fatal("router start:", err)

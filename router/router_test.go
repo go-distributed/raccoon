@@ -33,7 +33,7 @@ func TestRouter(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r, err := New(routerAddr)
+	r, err := New(routerAddr, "")
 	if err != nil {
 		t.Fatal(err)
 	}
