@@ -13,7 +13,8 @@ import (
 var _ = fmt.Printf
 
 func TestRegisterRouter(t *testing.T) {
-	r, err := router.New(":14817", "")
+	rId := "test router"
+	r, err := router.New(rId, ":14817", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,7 +28,7 @@ func TestRegisterRouter(t *testing.T) {
 		time.Sleep(time.Millisecond * 50)
 	}()
 
-	cr, err := NewCRouter("test router", ":14817")
+	cr, err := NewCRouter(rId, ":14817")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,7 +54,8 @@ func TestRegisterRouter(t *testing.T) {
 }
 
 func TestRegisterServiceInstance(t *testing.T) {
-	r, err := router.New(":14817", "")
+	rId := "test router"
+	r, err := router.New(rId, ":14817", "")
 	if err != nil {
 		t.Fatal(err)
 	}

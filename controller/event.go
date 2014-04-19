@@ -53,15 +53,15 @@ func (e *RmInstanceEvent) Type() string {
 	return RmInstanceEventType
 }
 
-type FailureInstanceEvnet struct {
-	reporter string
-	instance *instance.Instance
+type FailureInstanceEvent struct {
+	Reporter string
+	Instance *instance.Instance
 }
 
-func NewFailureInstanceEvent(reporter string, i *instance.Instance) *FailureInstanceEvnet {
-	return &FailureInstanceEvnet{reporter, i}
+func NewFailureInstanceEvent(reporter string, i *instance.Instance) *FailureInstanceEvent {
+	return &FailureInstanceEvent{reporter, i}
 }
 
-func (e *FailureInstanceEvnet) Type() string {
+func (e *FailureInstanceEvent) Type() string {
 	return FailureInstanceEventType
 }

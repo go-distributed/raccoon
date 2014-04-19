@@ -24,8 +24,8 @@ type RegInstanceReply struct {
 }
 
 type ReportFailureArgs struct {
-	reporter string
-	instance *instance.Instance
+	Reporter string
+	Instance *instance.Instance
 }
 
 func newControllerRPC(controller *Controller) *ControllerRPC {
@@ -47,6 +47,6 @@ func (rpc *ControllerRPC) RegisterServiceInstance(args *RegInstanceArgs, reply *
 }
 
 func (rpc *ControllerRPC) ReportFailure(args *ReportFailureArgs, reply *struct{}) error {
-	rpc.controller.ReportFailure(args.reporter, args.instance)
+	rpc.controller.ReportFailure(args.Reporter, args.Instance)
 	return nil
 }
