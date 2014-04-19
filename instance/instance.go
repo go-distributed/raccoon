@@ -1,7 +1,9 @@
 package instance
 
 import (
+	"log"
 	"net"
+	"net/rpc"
 )
 
 type Instance struct {
@@ -9,6 +11,13 @@ type Instance struct {
 	Name    string
 	Service string
 	Stats   *Stats
+}
+
+type RegInstanceArgs struct {
+	Instance *Instance
+}
+
+type RegInstanceReply struct {
 }
 
 func NewInstance(name, service, addrStr string) (*Instance, error) {
@@ -27,4 +36,20 @@ func NewInstance(name, service, addrStr string) (*Instance, error) {
 
 func (i *Instance) NewStats() {
 	i.Stats = new(Stats)
+}
+
+func (i *Instance) RegisterOnCtler(ctlAddr string) error {
+	c, err := rpc.Dial("tcp", ctlAddr)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	defer c.Close()
+
+	args := &RegInstanceArgs{
+		Instance: i,
+	}
+	err = c.Call("ControllerRPC.RegisterServiceInstance", args, nil)
+
+	return err
 }

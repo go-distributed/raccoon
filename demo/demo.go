@@ -17,7 +17,6 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
-	"net/rpc"
 	"os"
 	"strings"
 
@@ -46,8 +45,14 @@ func plotRouter() error {
 		return fmt.Errorf("Usage: demo r <cAddr> <rAddr> <id>")
 	}
 
+	addr, err := getInterfaceAddr()
+	if err != nil {
+		return err
+	}
+
 	cAddr := os.Args[2]
-	rAddr := os.Args[3]
+	port := os.Args[3]
+	rAddr := addr + port
 	id := os.Args[4]
 
 	// start router
@@ -61,26 +66,7 @@ func plotRouter() error {
 		return err
 	}
 
-	// register router in controller
-	regRouterArgs := &controller.RegRouterArgs{
-		Id: id,
-	}
-
-	addr, err := getInterfaceAddr()
-	if err != nil {
-		return err
-	}
-	regRouterArgs.Addr = addr + rAddr
-	//regRouterArgs.Addr = "127.0.0.1" + rAddr
-
-	client, err := rpc.Dial("tcp", cAddr)
-	if err != nil {
-		return err
-	}
-
-	//fmt.Println("debug:", regRouterArgs.Addr, cAddr)
-
-	err = client.Call("ControllerRPC.RegisterRouter", regRouterArgs, nil)
+	err = r.RegisterOnCtler()
 
 	return err
 }
@@ -101,8 +87,8 @@ func plotInstance() error {
 		w.Write(expectedReply)
 	}))
 
-	addr := ts.Listener.Addr().String()
-	port := addr[strings.Index(addr, ":"):]
+	portAddr := ts.Listener.Addr().String()
+	port := portAddr[strings.Index(portAddr, ":"):]
 
 	addr, err := getInterfaceAddr()
 	if err != nil {
@@ -119,16 +105,8 @@ func plotInstance() error {
 	}
 
 	// register instance to controller
-	regInstanceArgs := &controller.RegInstanceArgs{
-		Instance: instance,
-	}
 
-	client, err := rpc.Dial("tcp", cAddr)
-	if err != nil {
-		return err
-	}
-
-	err = client.Call("ControllerRPC.RegisterServiceInstance", regInstanceArgs, nil)
+	err = instance.RegisterOnCtler(cAddr)
 
 	return err
 }

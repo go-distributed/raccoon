@@ -34,6 +34,19 @@ type router struct {
 	sync.Mutex
 }
 
+type ReportFailureArgs struct {
+	Reporter string
+	Instance *instance.Instance
+}
+
+type RegRouterArgs struct {
+	Id   string
+	Addr string
+}
+
+type RegRouterReply struct {
+}
+
 func New(id string, addrStr string, controllerAddr string) (*router, error) {
 	r := &router{
 		id:          id,
@@ -232,4 +245,21 @@ func (r *router) ReportFailure(i *instance.Instance) error {
 	args := &ReportFailureArgs{r.id, i}
 	c.Call("ControllerRPC.ReportFailure", args, nil)
 	return nil
+}
+
+func (r *router) RegisterOnCtler() error {
+	c, err := rpc.Dial("tcp", r.controllerAddr.String())
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	defer c.Close()
+
+	args := &RegRouterArgs{
+		Id:   r.id,
+		Addr: r.addr.String(),
+	}
+	err = c.Call("ControllerRPC.RegisterRouter", args, nil)
+
+	return err
 }
