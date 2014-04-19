@@ -93,7 +93,7 @@ func plotInstance() error {
 
 	cAddr := os.Args[2]
 	id := os.Args[3]
-	service := "http test server"
+	service := "test service"
 
 	// start http test server
 	expectedReply := []byte("hello, world")

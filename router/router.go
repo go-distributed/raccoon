@@ -221,13 +221,15 @@ func (r *router) monitorFaliure() {
 	}
 }
 
-func (r *router) ReportFailure(i *instance.Instance) {
+func (r *router) ReportFailure(i *instance.Instance) error {
 	c, err := rpc.Dial("tcp", r.controllerAddr.String())
 	if err != nil {
 		log.Println(err)
+		return err
 	}
 	defer c.Close()
 
-	args := &ReportFailureArgs{r.addr.String(), i}
-	c.Call("serviceMethod", args, nil)
+	args := &ReportFailureArgs{r.id, i}
+	c.Call("ControllerRPC.ReportFailure", args, nil)
+	return nil
 }

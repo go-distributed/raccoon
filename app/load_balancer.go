@@ -101,3 +101,13 @@ func (lb *LoadBalancer) RmInstanceListener(event controller.Event) {
 		}
 	}
 }
+
+func (lb *LoadBalancer) FailureInstanceListener(event controller.Event) {
+	if event.Type() != controller.FailureInstanceEventType {
+		panic("")
+	}
+
+	e := event.(*controller.FailureInstanceEvent)
+
+	log.Printf("Failure Instance: '%v', '%v'", e.Reporter, e.Instance)
+}

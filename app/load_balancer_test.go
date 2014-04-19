@@ -38,8 +38,10 @@ func testLBFunction(t *testing.T, option int) {
 		t.Fatal(err)
 	}
 
+	cAddr := "127.0.0.1:14818"
 	rAddr := "127.0.0.1:14817"
-	r, err := router.New(rName, rAddr, "")
+
+	r, err := router.New(rName, rAddr, cAddr)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,11 +49,13 @@ func testLBFunction(t *testing.T, option int) {
 	r.Start()
 	defer r.Stop()
 
-	cAddr := "127.0.0.1:14818"
 	c, err := controller.New(cAddr)
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	c.Start()
+	defer c.Stop()
 
 	cr, err := controller.NewCRouter(rName, rAddr)
 	if err != nil {
@@ -90,4 +94,9 @@ func testLBFunction(t *testing.T, option int) {
 	}
 
 	assert.Equal(t, reply, expectedReply)
+
+	c.AddListener(controller.FailureInstanceEventType, lb.FailureInstanceListener)
+
+	err = r.ReportFailure(mapTo)
+	assert.Nil(t, err)
 }
