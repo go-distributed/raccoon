@@ -1,6 +1,7 @@
 package router
 
 import (
+	"encoding/gob"
 	"fmt"
 	"log"
 	"net"
@@ -98,6 +99,8 @@ func (r *router) Start() (err error) {
 
 	go r.monitorFaliure()
 
+	gob.Register(new(SimplePolicy))
+
 	return
 }
 
@@ -187,6 +190,8 @@ func (r *router) AddServiceInstance(sName string, instance *instance.Instance) e
 		return err
 	}
 
+	log.Println("Router: successfully added instance:", instance)
+
 	return nil
 }
 
@@ -204,6 +209,7 @@ func (r *router) RemoveServiceInstance(sName string, instance *instance.Instance
 		return err
 	}
 
+	log.Println("Router: successfully removed instance:", instance)
 	return nil
 }
 

@@ -72,8 +72,8 @@ func (lb *LoadBalancer) AddInstanceListener(event controller.Event) {
 			log.Println("Unknown port for service:", instance.Service)
 			continue
 		}
-		err := r.AddService(instance.Service, port, router.NewRoundRobinPolicy())
 
+		err := r.AddService(instance.Service, port, router.NewRoundRobinPolicy())
 		if err != nil {
 			log.Println(err)
 		}

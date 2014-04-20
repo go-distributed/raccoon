@@ -13,13 +13,14 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
-	"net/http/httptest"
 	"os"
 	"strings"
 
+	"github.com/go-distributed/raccoon/app"
 	"github.com/go-distributed/raccoon/controller"
 	"github.com/go-distributed/raccoon/instance"
 	"github.com/go-distributed/raccoon/router"
@@ -36,6 +37,10 @@ func plotController() error {
 	if err != nil {
 		return err
 	}
+
+	lb := app.NewLoadBalancer(c)
+	c.AddListener(controller.AddRouterEventType, lb.AddRouterListener)
+	c.AddListener(controller.AddInstanceEventType, lb.AddInstanceListener)
 
 	return nil
 }
@@ -71,7 +76,7 @@ func plotRouter() error {
 	return err
 }
 
-// Service: "http test server"
+// Service: "test service"
 func plotInstance() error {
 	if len(os.Args) < 4 {
 		return fmt.Errorf("Usage: demo i <cAddr> <id>")
@@ -81,21 +86,23 @@ func plotInstance() error {
 	id := os.Args[3]
 	service := "test service"
 
-	// start http test server
-	expectedReply := []byte("hello, world")
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write(expectedReply)
-	}))
-
-	portAddr := ts.Listener.Addr().String()
-	port := portAddr[strings.Index(portAddr, ":"):]
-
+	// start http server
 	addr, err := getInterfaceAddr()
 	if err != nil {
 		return err
 	}
 
-	iAddr := addr + port
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "hello, world")
+	})
+
+	l, err := net.Listen("tcp", addr+":0")
+	if err != nil {
+		return err
+	}
+	go http.Serve(l, nil)
+
+	iAddr := l.Addr().String()
 	//fmt.Println("http address:", iAddr)
 
 	// create instance
@@ -107,6 +114,22 @@ func plotInstance() error {
 	// register instance to controller
 
 	err = instance.RegisterOnCtler(cAddr)
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.Get("http://" + iAddr + "/")
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	reply, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	log.Println(string(reply))
 
 	return err
 }
