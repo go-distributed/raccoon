@@ -38,16 +38,16 @@ func plotController() error {
 		return err
 	}
 
-	lb := app.NewLoadBalancer(c)
-	c.AddListener(controller.AddRouterEventType, lb.AddRouterListener)
-	c.AddListener(controller.AddInstanceEventType, lb.AddInstanceListener)
+	da := app.NewDemoApp(c)
+	c.AddListener(controller.AddRouterEventType, da.AddRouterListener)
+	c.AddListener(controller.AddInstanceEventType, da.AddInstanceListener)
 
 	return nil
 }
 
 func plotRouter() error {
 	if len(os.Args) < 5 {
-		return fmt.Errorf("Usage: demo r <cAddr> <rAddr> <id>")
+		return fmt.Errorf("Usage: demo r <cAddr> <port> <id>")
 	}
 
 	addr, err := getInterfaceAddr()
@@ -59,6 +59,10 @@ func plotRouter() error {
 	port := os.Args[3]
 	rAddr := addr + port
 	id := os.Args[4]
+
+	if id != "rand" && id != "rr" {
+		return fmt.Errorf("for the sake of this demo, only ids of 'rand' and 'rr' are supported: %v", id)
+	}
 
 	// start router
 	r, err := router.New(id, rAddr, cAddr)
@@ -93,7 +97,7 @@ func plotInstance() error {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "hello, world")
+		fmt.Fprintf(w, "hello, world %v\n", id)
 	})
 
 	l, err := net.Listen("tcp", addr+":0")

@@ -30,6 +30,10 @@ func NewCRouter(id, addr string) (*CRouter, error) {
 	}, nil
 }
 
+func (cr *CRouter) Id() string {
+	return cr.id
+}
+
 func (cr *CRouter) AddService(sName, localAddr string, policy router.Policy) error {
 	sArgs := &router.ServiceArgs{
 		ServiceName: sName,

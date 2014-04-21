@@ -13,6 +13,7 @@ import (
 )
 
 type Router interface {
+	Id() string
 	AddService(sName, localAddr string, policy Policy) error
 	RemoveService(sName string) error
 	SetServicePolicy(sName string, policy Policy) error
@@ -69,6 +70,10 @@ func New(id string, addrStr string, controllerAddr string) (*router, error) {
 	}
 
 	return r, nil
+}
+
+func (r *router) Id() string {
+	return r.id
 }
 
 func (r *router) Start() (err error) {

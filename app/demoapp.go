@@ -7,33 +7,38 @@ import (
 	"github.com/go-distributed/raccoon/router"
 )
 
-type LoadBalancer struct {
+var rIdPolicyMap map[string]router.Policy
+
+func init() {
+	rIdPolicyMap = make(map[string]router.Policy)
+	rIdPolicyMap["rr"] = router.NewRoundRobinPolicy()
+	rIdPolicyMap["rand"] = router.NewRandomSelectPolicy()
+}
+
+type DemoApp struct {
 	Controller *controller.Controller
 }
 
-func NewLoadBalancer(c *controller.Controller) *LoadBalancer {
-	return &LoadBalancer{c}
+func NewDemoApp(c *controller.Controller) *DemoApp {
+	return &DemoApp{c}
 }
 
-// AddRouterListener makes the Load Balancer know of the newly added router.
-// It adds known service instances to the router and set service policy as round robin.
-// TODO: It assumes the new router is newly created: which means it has no services.
-func (lb *LoadBalancer) AddRouterListener(event controller.Event) {
+func (da *DemoApp) AddRouterListener(event controller.Event) {
 	if event.Type() != controller.AddRouterEventType {
 		panic("")
 	}
 
 	e := event.(*controller.AddRouterEvent)
 
-	r := lb.Controller.Routers[e.Id]
+	r := da.Controller.Routers[e.Id]
 
-	for service, instances := range lb.Controller.ServiceInstances {
+	for service, instances := range da.Controller.ServiceInstances {
 		port, ok := ServicePortMap[service]
 		if !ok {
 			log.Println("Unknown port for service:", service)
 			continue
 		}
-		err := r.AddService(service, port, router.NewRoundRobinPolicy())
+		err := r.AddService(service, port, rIdPolicyMap[e.Id])
 		if err != nil {
 			log.Println(err)
 		}
@@ -47,16 +52,13 @@ func (lb *LoadBalancer) AddRouterListener(event controller.Event) {
 	}
 }
 
-// AddInstanceListener makes the Load Balancer know of the newly added service instance.
-// It adds the service instances to the routers it knew.
-// TODO: It assumes the new instance is newly created: which means no other router had it before.
-func (lb *LoadBalancer) AddInstanceListener(event controller.Event) {
+func (da *DemoApp) AddInstanceListener(event controller.Event) {
 	if event.Type() != controller.AddInstanceEventType {
 		panic("")
 	}
 
 	e := event.(*controller.AddInstanceEvent)
-	for _, r := range lb.Controller.Routers {
+	for _, r := range da.Controller.Routers {
 		instance := e.Instance
 
 		port, ok := ServicePortMap[instance.Service]
@@ -65,7 +67,7 @@ func (lb *LoadBalancer) AddInstanceListener(event controller.Event) {
 			continue
 		}
 
-		err := r.AddService(instance.Service, port, router.NewRoundRobinPolicy())
+		err := r.AddService(instance.Service, port, rIdPolicyMap[r.Id()])
 		if err != nil {
 			log.Println(err)
 		}
@@ -77,14 +79,14 @@ func (lb *LoadBalancer) AddInstanceListener(event controller.Event) {
 	}
 }
 
-func (lb *LoadBalancer) RmInstanceListener(event controller.Event) {
+func (da *DemoApp) RmInstanceListener(event controller.Event) {
 	if event.Type() != controller.RmInstanceEventType {
 		panic("")
 	}
 
 	e := event.(*controller.RmInstanceEvent)
 
-	for _, r := range lb.Controller.Routers {
+	for _, r := range da.Controller.Routers {
 		instance := e.Instance
 
 		err := r.RemoveServiceInstance(instance.Service, instance)
@@ -94,7 +96,7 @@ func (lb *LoadBalancer) RmInstanceListener(event controller.Event) {
 	}
 }
 
-func (lb *LoadBalancer) FailureInstanceListener(event controller.Event) {
+func (da *DemoApp) FailureInstanceListener(event controller.Event) {
 	if event.Type() != controller.FailureInstanceEventType {
 		panic("")
 	}
