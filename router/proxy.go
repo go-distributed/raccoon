@@ -68,6 +68,8 @@ func (p *proxy) start() error {
 		}
 
 		go func(one net.Conn) {
+			defer one.Close()
+
 			i, err := p.service.selectInstance()
 
 			if err != nil {
@@ -82,7 +84,7 @@ func (p *proxy) start() error {
 				default:
 				}
 
-				log.Println(err)
+				log.Println("Failure report:", err)
 				return
 			}
 

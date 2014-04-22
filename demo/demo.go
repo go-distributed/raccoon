@@ -41,6 +41,7 @@ func plotController() error {
 	da := app.NewDemoApp(c)
 	c.AddListener(controller.AddRouterEventType, da.AddRouterListener)
 	c.AddListener(controller.AddInstanceEventType, da.AddInstanceListener)
+	c.AddListener(controller.FailureInstanceEventType, da.FailureInstanceListener)
 
 	return nil
 }

@@ -142,6 +142,8 @@ func (r *router) AddService(sName, localAddr string, policy Policy) error {
 
 	r.services[sName] = s
 
+	log.Println("Router: successfully added service:", sName)
+
 	return nil
 }
 
@@ -241,6 +243,7 @@ func (r *router) service(name string) (*service, error) {
 
 func (r *router) monitorFaliure() {
 	for i := range r.failureChan {
+		log.Println(r.id, "report failure:", i)
 		r.ReportFailure(i)
 	}
 }
