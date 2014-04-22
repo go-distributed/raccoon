@@ -1,6 +1,7 @@
 package router
 
 import (
+	"encoding/gob"
 	"fmt"
 	"log"
 	"net"
@@ -12,6 +13,7 @@ import (
 )
 
 type Router interface {
+	Id() string
 	AddService(sName, localAddr string, policy Policy) error
 	RemoveService(sName string) error
 	SetServicePolicy(sName string, policy Policy) error
@@ -70,6 +72,10 @@ func New(id string, addrStr string, controllerAddr string) (*router, error) {
 	return r, nil
 }
 
+func (r *router) Id() string {
+	return r.id
+}
+
 func (r *router) Start() (err error) {
 	s := rpc.NewServer()
 
@@ -97,6 +103,8 @@ func (r *router) Start() (err error) {
 	}()
 
 	go r.monitorFaliure()
+
+	gob.Register(new(SimplePolicy))
 
 	return
 }
@@ -133,6 +141,8 @@ func (r *router) AddService(sName, localAddr string, policy Policy) error {
 	go s.start()
 
 	r.services[sName] = s
+
+	log.Println("Router: successfully added service:", sName)
 
 	return nil
 }
@@ -187,6 +197,8 @@ func (r *router) AddServiceInstance(sName string, instance *instance.Instance) e
 		return err
 	}
 
+	log.Println("Router: successfully added instance:", instance)
+
 	return nil
 }
 
@@ -204,6 +216,7 @@ func (r *router) RemoveServiceInstance(sName string, instance *instance.Instance
 		return err
 	}
 
+	log.Println("Router: successfully removed instance:", instance)
 	return nil
 }
 
@@ -230,6 +243,7 @@ func (r *router) service(name string) (*service, error) {
 
 func (r *router) monitorFaliure() {
 	for i := range r.failureChan {
+		log.Println(r.id, "report failure:", i)
 		r.ReportFailure(i)
 	}
 }

@@ -7,13 +7,6 @@ import (
 	"github.com/go-distributed/raccoon/router"
 )
 
-var ServicePortMap map[string]string
-
-func init() {
-	ServicePortMap = make(map[string]string)
-	ServicePortMap["test service"] = ":8080"
-}
-
 type LoadBalancer struct {
 	Controller *controller.Controller
 }
@@ -25,7 +18,6 @@ func NewLoadBalancer(c *controller.Controller) *LoadBalancer {
 // AddRouterListener makes the Load Balancer know of the newly added router.
 // It adds known service instances to the router and set service policy as round robin.
 // TODO: It assumes the new router is newly created: which means it has no services.
-//func (lb *LoadBalancer) AddRouterListener(event *controller.AddRouterEvent) {
 func (lb *LoadBalancer) AddRouterListener(event controller.Event) {
 	if event.Type() != controller.AddRouterEventType {
 		panic("")
@@ -72,8 +64,8 @@ func (lb *LoadBalancer) AddInstanceListener(event controller.Event) {
 			log.Println("Unknown port for service:", instance.Service)
 			continue
 		}
-		err := r.AddService(instance.Service, port, router.NewRoundRobinPolicy())
 
+		err := r.AddService(instance.Service, port, router.NewRoundRobinPolicy())
 		if err != nil {
 			log.Println(err)
 		}

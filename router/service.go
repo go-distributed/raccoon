@@ -2,6 +2,7 @@ package router
 
 import (
 	"fmt"
+	"log"
 	"sync"
 
 	"github.com/go-distributed/raccoon/instance"
@@ -115,12 +116,14 @@ func (s *service) setPolicy(policy Policy) error {
 }
 
 func (s *service) start() error {
+	go s.monitorFaliure(s.routerFailureChan)
+
 	err := s.proxy.start()
 	if err != nil {
+		log.Println(s.name, "start error:", err)
 		return err
 	}
 
-	go s.monitorFaliure(s.routerFailureChan)
 	return nil
 }
 
